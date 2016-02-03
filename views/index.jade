@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+    |  
+    button.btn-md(id="simBtn") Simulate
+  div(id="main")
+    script(src='/javascripts/helper.js')
+    div(id="left-col")
+        script(src='/javascripts/left-pane.js')
+    div(id="right-col")
+      div(id="paper")
+        script(src='/javascripts/right-pane.js')

@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    title= title
+
+    //- JointJS
+    link(rel='stylesheet', href='/stylesheets/joint.min.css')    
+    script(src='/javascripts/dependencies/jquery.min.js')
+    script(src='/javascripts/dependencies/lodash.min.js')
+    script(src='/javascripts/dependencies/backbone-min.js')
+    script(src='/javascripts/dependencies/joint.min.js')
+
+    //- Bootstrap JS
+    script(src='/javascripts/dependencies/bootstrap.min.js')
+
+
+    //- Sample
+    link(rel='stylesheet', href='/stylesheets/sample.css')        
+    
+
+    //- Bootstrap
+    link(rel='stylesheet', href='/stylesheets/bootstrap-theme.min.css')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+
+    //- Others
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    block content
