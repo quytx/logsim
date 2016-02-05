@@ -24,6 +24,7 @@ lpaper.scale(1.2,1.2);
 
 var defaultX = 50;
 var defaultY = 30;
+var gapY = 70;
 
 // Default gates
 var lgates = {
@@ -31,16 +32,16 @@ var lgates = {
     
     // Input and output
     input: new joint.shapes.logic.Input({ position: { x: defaultX - 8, y: defaultY }}),
-    output: new joint.shapes.logic.Output({ position: { x: defaultX + 28, y: defaultY + 50 }}),
+    output: new joint.shapes.logic.Output({ position: { x: defaultX + 28, y: defaultY + 1 * gapY }}),
 
     // Logic gates
-    not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 100 }}),
-    and: new joint.shapes.logic.And({ position: { x: defaultX, y: defaultY + 150 }}),
-    nand: new joint.shapes.logic.Nand({ position: { x: defaultX, y: defaultY + 200 }}),
-    or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 250 }}),
-    nor: new joint.shapes.logic.Nor({ position: { x: defaultX, y: defaultY + 300 }}),
-    xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 350 }}),
-    xnor: new joint.shapes.logic.Xnor({ position: { x: defaultX, y: defaultY + 400 }})
+    not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 2 * gapY }}),
+    and: new joint.shapes.logic.And({ position: { x: defaultX, y: defaultY + 3 * gapY }}),
+    nand: new joint.shapes.logic.Nand({ position: { x: defaultX, y: defaultY + 4 * gapY }}),
+    or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 5 * gapY }}),
+    nor: new joint.shapes.logic.Nor({ position: { x: defaultX, y: defaultY + 6 * gapY }}),
+    xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 7 * gapY }}),
+    xnor: new joint.shapes.logic.Xnor({ position: { x: defaultX, y: defaultY + 8 * gapY }})
     
     // More gates here (remember to add to helper.js as well)
 
