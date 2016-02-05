@@ -1,11 +1,11 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 #main {
     width: 100%;
-    height: 604px;
+    height: 814px;
 }
 
 #left-col {
@@ -26,5 +26,9 @@ body {
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+
+#zoomBtn {
+    float: right;
 }

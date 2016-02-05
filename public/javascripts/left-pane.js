@@ -3,7 +3,7 @@ var lgraph = new joint.dia.Graph();
 var lpaper = new joint.dia.Paper({
     el: $('#left-col'),
     model: lgraph,
-    width: 300, height: 600, gridSize: 5,
+    width: 300, height: 814, gridSize: 5,
     snapLinks: false,
     linkPinning: false,
     interactive: false,
@@ -12,8 +12,16 @@ var lpaper = new joint.dia.Paper({
     }
 });
 
-// zoom the viewport by 50%
+// zoom the viewport by 20%
 lpaper.scale(1.2,1.2);
+
+// Resize paper to fit outter div
+// var navDiv = document.getElementById('left-col');
+// lpaper.setDimensions(navDiv.offsetWidth, navDiv.offsetHeight);
+// console.log(lpaper);
+// console.log(navDiv.offsetWidth, navDiv.offsetHeight);
+
+
 var defaultX = 50;
 var defaultY = 30;
 
@@ -26,10 +34,10 @@ var lgates = {
     output: new joint.shapes.logic.Output({ position: { x: defaultX + 28, y: defaultY + 50 }}),
 
     // Logic gates
-    or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 100 }}),
+    not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 100 }}),
     and: new joint.shapes.logic.And({ position: { x: defaultX, y: defaultY + 150 }}),
-    not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 200 }}),
-    nand: new joint.shapes.logic.Nand({ position: { x: defaultX, y: defaultY + 250 }}),
+    nand: new joint.shapes.logic.Nand({ position: { x: defaultX, y: defaultY + 200 }}),
+    or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 250 }}),
     nor: new joint.shapes.logic.Nor({ position: { x: defaultX, y: defaultY + 300 }}),
     xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 350 }}),
     xnor: new joint.shapes.logic.Xnor({ position: { x: defaultX, y: defaultY + 400 }})

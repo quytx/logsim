@@ -1,4 +1,6 @@
 var demo = false;
+var simulateOn = false;
+var scale = { x: 1, y: 1, rate: 1.1 };
 
 var rgraph = new joint.dia.Graph();
 
@@ -6,7 +8,7 @@ var rpaper = new joint.dia.Paper({
 
     el: $('#paper'),
     model: rgraph,
-    width: 1250, height: 600, gridSize: 5,
+    width: 1260, height: 800, gridSize: 5,
     snapLinks: true,
     linkPinning: false,
     perpendicularLinks: true,
@@ -37,8 +39,27 @@ var rpaper = new joint.dia.Paper({
     }
 });
 
-// zoom the viewport by 50%
-rpaper.scale(1,1);
+// scale
+rpaper.scale(scale.x, scale.y);
+
+// Resize paper to fit outter div
+var mainDiv = document.getElementById('right-col');
+rpaper.setDimensions(mainDiv.offsetWidth, mainDiv.offsetHeight);
+// console.log(mainDiv.offsetWidth, mainDiv.offsetHeight);
+
+// Zoom in 
+$('#zoomInBtn').click(function() {
+    scale.x = scale.x * scale.rate;
+    scale.y = scale.y * scale.rate;
+    rpaper.scale(scale.x, scale.y);
+});
+
+// Zoom out
+$('#zoomOutBtn').click(function() {
+    scale.x = scale.x / scale.rate;
+    scale.y = scale.y / scale.rate;
+    rpaper.scale(scale.x, scale.y);
+});
 
 
 function toggleLive(model, signal) {
@@ -52,7 +73,7 @@ function broadcastSignal(gate, signal) {
 }
 
 function initializeSignal() {
-
+    
     var signal = Math.random();
     // > 0 wire with a positive signal is alive
     // < 0 wire with a negative signal means, there is no signal 
@@ -66,6 +87,11 @@ function initializeSignal() {
         V(this).removeClass('live');
     });
 
+    // If not in simulation mode, return
+    if (!simulateOn) { return signal ; }
+
+
+    // Otherwise broadcast signals
     _.each(rgraph.getElements(), function(element) {
         // broadcast a new signal from every input in the rgraph
         (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, signal);
@@ -89,8 +115,65 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 
 // diagramm setup
 
+if (!demo) {
+
+    var current = {};
+
+    rgraph.on('change:source change:target', function(model, end) {
+
+        var e = 'target' in model.changed ? 'target' : 'source';
+
+        if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
+            // if source/target has been connected to a port or disconnected from a port reinitialize signals
+            current = initializeSignal();
+        }
+    });
+
+    rgraph.on('change:signal', function(wire, signal) {
+
+        toggleLive(wire, signal);
+
+        var magnitude = Math.abs(signal);
+
+        // if a new signal has been generated stop transmitting the old one
+        if (magnitude !== current) return;
+
+        var gate = rgraph.getCell(wire.get('target').id);
+
+        if (gate) {
+
+            gate.onSignal(signal, function() {
+
+                // get an array of signals on all input ports
+                var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
+                    .groupBy(function(wire) {
+                        return wire.get('target').port;
+                    })
+                    .map(function(wires) {
+                        return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
+                    })
+                    .value();
+
+                // calculate the output signal
+                var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
+                
+                broadcastSignal(gate, output);
+            });
+       }
+    });
+
+    $("#simBtn").click(function() {
+        // _.each(rgraph.getLinks(), function(link) {
+        //     //console.log(JSON.stringify(link));
+        //     rgraph.addCell(rpaper.getDefaultLink().set(JSON.stringify(link)));
+        // });
+        simulateOn = !simulateOn;
+        current = initializeSignal();
+    });
+}
+
 //---------------------------------------
-if (demo) {
+else {
     var gates = {
         repeater: new joint.shapes.logic.Repeater({ position: { x: 410, y: 25 }}),
         // or: new joint.shapes.logic.Or({ position: { x: 550, y: 50 }}),
@@ -171,4 +254,6 @@ if (demo) {
         current = initializeSignal();
     });
 }
+
+
 

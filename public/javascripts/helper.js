@@ -1,3 +1,4 @@
+// Add a new gate to the graph when a certain type of gate is clicked
 var addGate = function(graph, type, xpos, ypos) {
     var newGate;
     switch(type) {
