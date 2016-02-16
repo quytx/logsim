@@ -24,7 +24,7 @@ lpaper.scale(1.2,1.2);
 
 var defaultX = 50;
 var defaultY = 30;
-var gapY = 70;
+var gapY = 60;
 
 // Default gates
 var lgates = {
@@ -41,7 +41,8 @@ var lgates = {
     or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 5 * gapY }}),
     nor: new joint.shapes.logic.Nor({ position: { x: defaultX, y: defaultY + 6 * gapY }}),
     xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 7 * gapY }}),
-    xnor: new joint.shapes.logic.Xnor({ position: { x: defaultX, y: defaultY + 8 * gapY }})
+    xnor: new joint.shapes.logic.Xnor({ position: { x: defaultX, y: defaultY + 8 * gapY }}),
+    dff: new joint.shapes.logic.Dff({ position: { x: defaultX, y: defaultY + 9 * gapY }})
     
     // More gates here (remember to add to helper.js as well)
 

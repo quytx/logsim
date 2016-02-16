@@ -1,5 +1,6 @@
-var demo = false;
+//var demo = false;
 var simulateOn = false;
+var timeStep = 0;
 var scale = { x: 1, y: 1, rate: 1.1 };
 
 var rgraph = new joint.dia.Graph();
@@ -72,9 +73,16 @@ function broadcastSignal(gate, signal) {
     _.defer(_.invoke, rgraph.getConnectedLinks(gate, { outbound: true }), 'set', 'signal', signal);
 }
 
+function incrDff() {
+    _.each(rgraph.getElements(), function(element) {
+        (element instanceof joint.shapes.logic.Dff) && element.nextTimeStep.apply();
+    });
+    timeStep++;
+}
+
 function initializeSignal() {
     
-    var signal = Math.random();
+    var signal = 1;
     // > 0 wire with a positive signal is alive
     // < 0 wire with a negative signal means, there is no signal 
     // 0 none of the above - reset value
@@ -115,145 +123,177 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 
 // diagramm setup
 
-if (!demo) {
 
-    var current = {};
+var current = {};
 
-    rgraph.on('change:source change:target', function(model, end) {
+rgraph.on('change:source change:target', function(model, end) {
 
-        var e = 'target' in model.changed ? 'target' : 'source';
+    var e = 'target' in model.changed ? 'target' : 'source';
 
-        if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
-            // if source/target has been connected to a port or disconnected from a port reinitialize signals
-            current = initializeSignal();
-        }
-    });
-
-    rgraph.on('change:signal', function(wire, signal) {
-
-        toggleLive(wire, signal);
-
-        var magnitude = Math.abs(signal);
-
-        // if a new signal has been generated stop transmitting the old one
-        if (magnitude !== current) return;
-
-        var gate = rgraph.getCell(wire.get('target').id);
-
-        if (gate) {
-
-            gate.onSignal(signal, function() {
-
-                // get an array of signals on all input ports
-                var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
-                    .groupBy(function(wire) {
-                        return wire.get('target').port;
-                    })
-                    .map(function(wires) {
-                        return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
-                    })
-                    .value();
-
-                // calculate the output signal
-                var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
-                
-                broadcastSignal(gate, output);
-            });
-       }
-    });
-
-    $("#simBtn").click(function() {
-        // _.each(rgraph.getLinks(), function(link) {
-        //     //console.log(JSON.stringify(link));
-        //     rgraph.addCell(rpaper.getDefaultLink().set(JSON.stringify(link)));
-        // });
-        simulateOn = !simulateOn;
+    if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
+        // if source/target has been connected to a port or disconnected from a port reinitialize signals
         current = initializeSignal();
+    }
+});
+
+rgraph.on('change:signal', function(wire, signal) {
+
+    toggleLive(wire, signal);
+
+    var magnitude = Math.abs(signal);
+
+    // if a new signal has been generated stop transmitting the old one
+    if (magnitude !== current) return;
+
+    var gate = rgraph.getCell(wire.get('target').id);
+
+    if (gate) {
+
+        gate.onSignal(signal, function() {
+
+            // get an array of signals on all input ports
+            var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
+                .groupBy(function(wire) {
+                    return wire.get('target').port;
+                })
+                .map(function(wires) {
+                    return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
+                })
+                .value();
+
+            // calculate the output signal
+            var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
+            
+            broadcastSignal(gate, output);
+        });
+   }
+});
+
+$("#simBtn").click(function() {
+    // _.each(rgraph.getLinks(), function(link) {
+    //     //console.log(JSON.stringify(link));
+    //     rgraph.addCell(rpaper.getDefaultLink().set(JSON.stringify(link)));
+    // });
+    var sequentialLogic = false;
+    _.each(rgraph.getElements(), function(element) {
+        if (element instanceof joint.shapes.logic.Dff)
+            sequentialLogic = true;
     });
-}
+
+    if (!simulateOn) {
+        simulateOn = true;
+        $("#simBtn").remove();
+        if (sequentialLogic) {
+            $("#stepBtn").css('visibility', 'visible');    
+        }
+    } 
+    current = initializeSignal();
+});
+
+$("#stepForward").click(function() {
+    incrDff();
+    $("#currTimeStep").html(timeStep);
+    current = initializeSignal();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //---------------------------------------
-else {
-    var gates = {
-        repeater: new joint.shapes.logic.Repeater({ position: { x: 410, y: 25 }}),
-        // or: new joint.shapes.logic.Or({ position: { x: 550, y: 50 }}),
-        // and: new joint.shapes.logic.And({ position: { x: 550, y: 150 }}),
-        not: new joint.shapes.logic.Not({ position: { x: 90, y: 140 }}),
-        // nand: new joint.shapes.logic.Nand({ position: { x: 550, y: 250 }}),
-        nor: new joint.shapes.logic.Nor({ position: { x: 270, y: 190 }}),
-        // xor: new joint.shapes.logic.Xor({ position: { x: 550, y: 200 }}),
-        // xnor: new joint.shapes.logic.Xnor({ position: { x: 550, y: 100 }}),
-        input: new joint.shapes.logic.Input({ position: { x: 5, y: 45 }}),
-        output: new joint.shapes.logic.Output({ position: { x: 440, y: 290 }})
-    };
+// else {
+//     var gates = {
+//         repeater: new joint.shapes.logic.Repeater({ position: { x: 410, y: 25 }}),
+//         // or: new joint.shapes.logic.Or({ position: { x: 550, y: 50 }}),
+//         // and: new joint.shapes.logic.And({ position: { x: 550, y: 150 }}),
+//         not: new joint.shapes.logic.Not({ position: { x: 90, y: 140 }}),
+//         // nand: new joint.shapes.logic.Nand({ position: { x: 550, y: 250 }}),
+//         nor: new joint.shapes.logic.Nor({ position: { x: 270, y: 190 }}),
+//         // xor: new joint.shapes.logic.Xor({ position: { x: 550, y: 200 }}),
+//         // xnor: new joint.shapes.logic.Xnor({ position: { x: 550, y: 100 }}),
+//         input: new joint.shapes.logic.Input({ position: { x: 5, y: 45 }}),
+//         output: new joint.shapes.logic.Output({ position: { x: 440, y: 290 }})
+//     };
 
 
-    var wires = [
-        { source: { id: gates.input.id, port: 'out' }, target: { id: gates.not.id, port: 'in' }},
-        { source: { id: gates.not.id, port: 'out' }, target: { id: gates.nor.id, port: 'in1' }},
-        { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.repeater.id, port: 'in' }},
-        { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.output.id, port: 'in' }},
-        { source: { id: gates.repeater.id, port: 'out' }, target: { id: gates.nor.id, port: 'in2'},
-          vertices: [{ x: 215, y: 100 }]
-        }
-    ];
+//     var wires = [
+//         { source: { id: gates.input.id, port: 'out' }, target: { id: gates.not.id, port: 'in' }},
+//         { source: { id: gates.not.id, port: 'out' }, target: { id: gates.nor.id, port: 'in1' }},
+//         { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.repeater.id, port: 'in' }},
+//         { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.output.id, port: 'in' }},
+//         { source: { id: gates.repeater.id, port: 'out' }, target: { id: gates.nor.id, port: 'in2'},
+//           vertices: [{ x: 215, y: 100 }]
+//         }
+//     ];
 
-    // add gates and wires to the rgraph
-    rgraph.addCells(_.toArray(gates));
-    _.each(wires, function(attributes) {
-        rgraph.addCell(rpaper.getDefaultLink().set(attributes));
-    });
+//     // add gates and wires to the rgraph
+//     rgraph.addCells(_.toArray(gates));
+//     _.each(wires, function(attributes) {
+//         rgraph.addCell(rpaper.getDefaultLink().set(attributes));
+//     });
 
-    rgraph.on('change:source change:target', function(model, end) {
+//     rgraph.on('change:source change:target', function(model, end) {
 
-        var e = 'target' in model.changed ? 'target' : 'source';
+//         var e = 'target' in model.changed ? 'target' : 'source';
 
-        if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
-            // if source/target has been connected to a port or disconnected from a port reinitialize signals
-            current = initializeSignal();
-        }
-    });
+//         if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
+//             // if source/target has been connected to a port or disconnected from a port reinitialize signals
+//             current = initializeSignal();
+//         }
+//     });
 
-    rgraph.on('change:signal', function(wire, signal) {
+//     rgraph.on('change:signal', function(wire, signal) {
 
-        toggleLive(wire, signal);
+//         toggleLive(wire, signal);
 
-        var magnitude = Math.abs(signal);
+//         var magnitude = Math.abs(signal);
 
-        // if a new signal has been generated stop transmitting the old one
-        if (magnitude !== current) return;
+//         // if a new signal has been generated stop transmitting the old one
+//         if (magnitude !== current) return;
 
-        var gate = rgraph.getCell(wire.get('target').id);
+//         var gate = rgraph.getCell(wire.get('target').id);
 
-        if (gate) {
+//         if (gate) {
 
-            gate.onSignal(signal, function() {
+//             gate.onSignal(signal, function() {
 
-                // get an array of signals on all input ports
-                var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
-                    .groupBy(function(wire) {
-                        return wire.get('target').port;
-                    })
-                    .map(function(wires) {
-                        return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
-                    })
-                    .value();
+//                 // get an array of signals on all input ports
+//                 var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
+//                     .groupBy(function(wire) {
+//                         return wire.get('target').port;
+//                     })
+//                     .map(function(wires) {
+//                         return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
+//                     })
+//                     .value();
 
-                // calculate the output signal
-                var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
+//                 // calculate the output signal
+//                 var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
                 
-                broadcastSignal(gate, output);
-            });
-       }
-    });
-    //---------------------------------------
-    // initialize signal and keep its value
-    var current = {};
+//                 broadcastSignal(gate, output);
+//             });
+//        }
+//     });
+//     //---------------------------------------
+//     // initialize signal and keep its value
+//     var current = {};
 
-    $("#simBtn").click(function() {
-        current = initializeSignal();
-    });
-}
+//     $("#simBtn").click(function() {
+//         current = initializeSignal();
+//     });
+// }
 
 
 
