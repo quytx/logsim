@@ -32,3 +32,11 @@ a {
 #zoomBtn {
     float: right;
 }
+
+#stepBtn {
+    visibility: hidden;
+}
+
+#currTimeStep {
+    color: red;
+}

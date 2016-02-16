@@ -1,17 +1,31 @@
 extends layout
 
 block content
-  h1= title
-    |  
-    button.btn-md(id="simBtn") Simulate
-    p(id="zoomBtn")
-        button.btn-xs(id="zoomOutBtn") -   
+  div(ng-controller="SimController")
+    h1= title
+      |  
+      button.btn-md.btn-success(id="simBtn")
+        i.fa.fa-play 
+      | 
+      span(id="stepBtn")
+        //-button.btn-md.btn-primary(id="stepBackward")
+          i.fa.fa-step-backward 
+        //-| 
+        button.btn-md.btn-primary(id="stepForward")
+          i.fa.fa-step-forward 
         | 
-        button.btn-xs(id="zoomInBtn") +   
-  div(id="main")
-    script(src='/javascripts/helper.js')
-    div(id="left-col")
-        script(src='/javascripts/left-pane.js')
-    div(id="right-col")
-      div(id="paper")
-        script(src='/javascripts/right-pane.js')
+        span Time step: 
+          span(id="currTimeStep") 0
+
+      p(id="zoomBtn")
+          button.btn-xs(id="zoomOutBtn") -   
+          | 
+          button.btn-xs(id="zoomInBtn") +   
+
+    div(id="main")
+      script(src='/javascripts/helper.js')
+      div(id="left-col")
+          script(src='/javascripts/left-pane.js')
+      div(id="right-col")
+        div(id="paper")
+          script(src='/javascripts/right-pane.js')
