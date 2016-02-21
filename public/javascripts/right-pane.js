@@ -150,9 +150,11 @@ rgraph.on('change:signal', function(wire, signal) {
     if (gate) {
 
         gate.onSignal(signal, function() {
-
             // get an array of signals on all input ports
             var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
+                .sortBy(function(wire) { 
+                    return wire.get('target').port;     // sort all inputs based on labels (in1, in2, ...)
+                })
                 .groupBy(function(wire) {
                     return wire.get('target').port;
                 })
@@ -160,12 +162,13 @@ rgraph.on('change:signal', function(wire, signal) {
                     return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
                 })
                 .value();
-
             // calculate the output signal
+            // console.log(inputs);
             var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
             
             broadcastSignal(gate, output);
         });
+        // }
    }
 });
 

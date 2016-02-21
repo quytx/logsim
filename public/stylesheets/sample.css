@@ -77,8 +77,10 @@
 }
 
 .element .body {
-    fill: #68DDD5;
-    stroke: #44CCC3;
+    /* fill: #68DDD5; 
+    stroke: #44CCC3; */
+    fill: #ccc;
+    stroke: #000;
     stroke-opacity: 0.5;
     transition: all 0.2s;
 }
@@ -95,7 +97,8 @@
 }
 
 .link.live > .connection {
-    stroke: #7c68fc;
+    /* stroke: #7c68fc; */
+    stroke: #A94442;
     stroke-width: 3px;
 }
 
