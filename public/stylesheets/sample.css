@@ -99,7 +99,7 @@
 .link.live > .connection {
     /* stroke: #7c68fc; */
     stroke: #A94442;
-    stroke-width: 3px;
+    //stroke-width: 3px;
 }
 
 .live .connection-wrap {

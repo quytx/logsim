@@ -22,7 +22,8 @@ lpaper.scale(1.2,1.2);
 // console.log(navDiv.offsetWidth, navDiv.offsetHeight);
 
 
-var defaultX = 50;
+var defaultX = 25;
+var defaultXr = 155;
 var defaultY = 30;
 var gapY = 50;
 
@@ -32,18 +33,23 @@ var lgates = {
     
     // Input and output
     input: new joint.shapes.logic.Input({ position: { x: defaultX - 8, y: defaultY }}),
-    output: new joint.shapes.logic.Output({ position: { x: defaultX + 28, y: defaultY + 1 * gapY }}),
+    output: new joint.shapes.logic.Output({ position: { x: defaultXr + 28, y: defaultY }}),
 
     // Logic gates
-    not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 2 * gapY }}),
-    and: new joint.shapes.logic.And({ position: { x: defaultX, y: defaultY + 3 * gapY }}),
-    nand: new joint.shapes.logic.Nand({ position: { x: defaultX, y: defaultY + 4 * gapY }}),
-    or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 5 * gapY }}),
-    nor: new joint.shapes.logic.Nor({ position: { x: defaultX, y: defaultY + 6 * gapY }}),
-    xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 7 * gapY }}),
-    xnor: new joint.shapes.logic.Xnor({ position: { x: defaultX, y: defaultY + 8 * gapY }}),
-    mux21: new joint.shapes.logic.Mux21({ position: { x: defaultX, y: defaultY + 9 * gapY }}),
-    dff: new joint.shapes.logic.Dff({ position: { x: defaultX, y: defaultY + 10 * gapY }})
+    not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 1 * gapY }}),
+    dff: new joint.shapes.logic.Dff({ position: { x: defaultXr, y: defaultY + 1 * gapY }}),
+    and: new joint.shapes.logic.And({ position: { x: defaultX, y: defaultY + 2 * gapY }}),
+    nand: new joint.shapes.logic.Nand({ position: { x: defaultXr, y: defaultY + 2 * gapY }}),
+    or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 3 * gapY }}),
+    nor: new joint.shapes.logic.Nor({ position: { x: defaultXr, y: defaultY + 3 * gapY }}),
+    xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 4 * gapY }}),
+    xnor: new joint.shapes.logic.Xnor({ position: { x: defaultXr, y: defaultY + 4 * gapY }}),
+    mux21: new joint.shapes.logic.Mux21({ position: { x: defaultX, y: defaultY + 5 * gapY }}),
+    mux21_16: new joint.shapes.logic.Mux21_16({ position: { x: defaultXr, y: defaultY + 5 * gapY }}),
+    joiner: new joint.shapes.logic.Joiner({ position: { x: defaultX, y: defaultY + 6 * gapY }}),
+    splitter: new joint.shapes.logic.Splitter({ position: { x: defaultXr, y: defaultY + 6 * gapY }})
+    
+    
     
     // More gates here (remember to add to helper.js as well)
 
@@ -78,13 +84,12 @@ lpaper.on('cell:pointerdown', function(cellView, evt, x, y) {
     //     }
     // });
 
-
 })
 
-lpaper.on('cell:pointerup', function(evt) { 
-    // resetLeftPane(lgates);
-    // rgraph.resetCells(_.toArray(lgates));
-    // document.getElementById('tmpDiv').remove();
-})
+// lpaper.on('cell:pointerup', function(evt) { 
+//     // resetLeftPane(lgates);
+//     // rgraph.resetCells(_.toArray(lgates));
+//     // document.getElementById('tmpDiv').remove();
+// })
 
 

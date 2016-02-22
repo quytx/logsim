@@ -31,7 +31,16 @@ var addGate = function(graph, type, xpos, ypos) {
             break;
         case "logic.Mux21":
             newGate = new joint.shapes.logic.Mux21({ position: { x: xpos, y: ypos}});
-            break;     
+            break;  
+        case "logic.Mux21_16":
+            newGate = new joint.shapes.logic.Mux21_16({ position: { x: xpos, y: ypos}});
+            break;
+        case "logic.Splitter":
+            newGate = new joint.shapes.logic.Splitter({ position: { x: xpos, y: ypos}});
+            break;  
+        case "logic.Joiner":
+            newGate = new joint.shapes.logic.Joiner({ position: { x: xpos, y: ypos}});
+            break;            
         case "logic.Dff":
             newGate = new joint.shapes.logic.Dff({ position: { x: xpos, y: ypos}});
             newGate.outQ = undefined;
@@ -60,3 +69,16 @@ var addGate = function(graph, type, xpos, ypos) {
     }
     graph.addCell(newGate);
 }
+
+var busInputGates = ['logic.Mux21_16', 'logic.Splitter'];
+var busOutputGates = ['logic.Mux21_16', 'logic.Joiner'];
+
+var hasBusInput = function(cv) {
+    return _.indexOf(busInputGates, cv.model.attributes.type) > -1;
+}
+
+var hasBusOutput = function(cv) {
+    return _.indexOf(busOutputGates, cv.model.attributes.type) > -1;
+}
+
+
