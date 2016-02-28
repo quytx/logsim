@@ -36,7 +36,12 @@ var rpaper = new joint.dia.Paper({
                 if (vt.model.attributes.type === 'logic.Joiner') {                    
                     vl.model.set('joinerTargetId', vt.model.id);
                 }
-                return true;
+                return true;    // no need to check if port already used
+            }
+
+            // Label if source is a splitter
+            if (vs.model.attributes.type === 'logic.Splitter') {
+                vl.model.set('splitterSourceId', vs.model.id);
             }
 
             // check whether the port is being already used
@@ -50,9 +55,9 @@ var rpaper = new joint.dia.Paper({
             return !portUsed;
 
         } else { // e === 'source'
-            
             // source requires an output port to connect
-            return ms && ms.getAttribute('class') && ms.getAttribute('class').indexOf('output') >= 0; 
+            //return ms && ms.getAttribute('class') && ms.getAttribute('class').indexOf('output') >= 0; 
+            return false;   // Dragging a link's source end is disabled
         }
     }
 });
@@ -194,6 +199,9 @@ rgraph.on('change', function(cell) {
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
         setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length);
+    } else if (cell.get('splitterSourceId') !== undefined && cell.attributes.labels === undefined) {
+        var splitter = rgraph.getCell(cell.get('splitterSourceId'));
+        setLabel(cell, rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1);
     }
 })
 
@@ -205,6 +213,17 @@ rgraph.on('remove', function(cell) {
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
         // Re-label links with higher label
         _.each(rgraph.getConnectedLinks(joiner, { inbound: true }), function(link) {
+            var currLabel = link.attributes.labels[0].attrs.text.text;
+            if (currLabel > removedLabel) {
+                setLabel(link, currLabel - 1);
+            }
+        });
+    } else if (cell.get('splitterSourceId') !== undefined) {
+        var removedLabel = cell.attributes.labels[0].attrs.text.text;
+        // Find source
+        var splitter = rgraph.getCell(cell.get('splitterSourceId'));
+        // Re-label links with higher label
+        _.each(rgraph.getConnectedLinks(splitter, { outbound: true }), function(link) {
             var currLabel = link.attributes.labels[0].attrs.text.text;
             if (currLabel > removedLabel) {
                 setLabel(link, currLabel - 1);
