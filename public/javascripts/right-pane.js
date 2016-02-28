@@ -17,7 +17,6 @@ var rpaper = new joint.dia.Paper({
         if (hasBusOutput(cv)) {
             return new joint.shapes.logic.Bus;
         } else {
-            console.log(m);
             return new joint.shapes.logic.Wire;
         }
     }, 
@@ -33,22 +32,9 @@ var rpaper = new joint.dia.Paper({
 
             // Allow multi-input
             if (hasMultiInput(vt)) {
-
                 // label if target is a joiner
-                if (vt.model.attributes.type === 'logic.Joiner') {
-                    // Get next label
-                    if (vt.model.get('numConnections') === undefined) {
-                        vt.model.set('numConnections', 0);
-                    }
-                    var nextLabel = vt.model.get('numConnections');
-
-                    // Update link label
-                    setLabel(vl.model, nextLabel);
-                    vl.model.set('isJoiner', true);
-                    // console.log(vt.model.id);
+                if (vt.model.attributes.type === 'logic.Joiner') {                    
                     vl.model.set('joinerTargetId', vt.model.id);
-                    // Increment target's number of connections
-                    vt.model.set('numConnections', nextLabel + 1);
                 }
                 return true;
             }
@@ -203,8 +189,20 @@ rgraph.on('change:signal', function(wire, signal) {
    }
 });
 
+rgraph.on('change', function(cell) {
+   
+    if (cell.get('joinerTargetId') !== undefined && cell.attributes.labels === undefined) {
+        // Find target
+        var joiner = rgraph.getCell(cell.get('joinerTargetId'));
+        setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length);
+    } else if (cell.attributes.type === 'logic.Joiner') {
+        console.log('yeeee');
+        cell.set('numConnections', rgraph.getConnectedLinks(cell, { inbound: true }).length);
+    }
+})
 
-var ccc;
+
+
 rgraph.on('remove', function(cell) {
     
    if (cell.get('joinerTargetId') !== undefined) {
@@ -222,6 +220,8 @@ rgraph.on('remove', function(cell) {
         });
    }
 })
+
+
 
 $("#simBtn").click(function() {
 
