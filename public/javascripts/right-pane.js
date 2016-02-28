@@ -190,35 +190,27 @@ rgraph.on('change:signal', function(wire, signal) {
 });
 
 rgraph.on('change', function(cell) {
-   
     if (cell.get('joinerTargetId') !== undefined && cell.attributes.labels === undefined) {
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
         setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length);
-    } else if (cell.attributes.type === 'logic.Joiner') {
-        console.log('yeeee');
-        cell.set('numConnections', rgraph.getConnectedLinks(cell, { inbound: true }).length);
     }
 })
 
 
-
 rgraph.on('remove', function(cell) {
-    
-   if (cell.get('joinerTargetId') !== undefined) {
+    if (cell.get('joinerTargetId') !== undefined) {
         var removedLabel = cell.attributes.labels[0].attrs.text.text;
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
-        // Decrement 
-        joiner.set('numConnections', joiner.get('numConnections') - 1);
-        // Re-label
+        // Re-label links with higher label
         _.each(rgraph.getConnectedLinks(joiner, { inbound: true }), function(link) {
             var currLabel = link.attributes.labels[0].attrs.text.text;
             if (currLabel > removedLabel) {
                 setLabel(link, currLabel - 1);
             }
         });
-   }
+    }
 })
 
 
