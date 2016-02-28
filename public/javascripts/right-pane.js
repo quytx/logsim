@@ -10,13 +10,14 @@ var rpaper = new joint.dia.Paper({
     el: $('#paper'),
     model: rgraph,
     width: 1260, height: 800, gridSize: 5,
-    snapLinks: true,
+    snapLinks: false,
     linkPinning: false,
     perpendicularLinks: false,
     defaultLink: function(cv,m) {
         if (hasBusOutput(cv)) {
             return new joint.shapes.logic.Bus;
         } else {
+            console.log(m);
             return new joint.shapes.logic.Wire;
         }
     }, 
@@ -29,6 +30,28 @@ var rpaper = new joint.dia.Paper({
 
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
+
+            // Allow multi-input
+            if (hasMultiInput(vt)) {
+
+                // label if target is a joiner
+                if (vt.model.attributes.type === 'logic.Joiner') {
+                    // Get next label
+                    if (vt.model.get('numConnections') === undefined) {
+                        vt.model.set('numConnections', 0);
+                    }
+                    var nextLabel = vt.model.get('numConnections');
+
+                    // Update link label
+                    setLabel(vl.model, nextLabel);
+                    vl.model.set('isJoiner', true);
+                    // console.log(vt.model.id);
+                    vl.model.set('joinerTargetId', vt.model.id);
+                    // Increment target's number of connections
+                    vt.model.set('numConnections', nextLabel + 1);
+                }
+                return true;
+            }
 
             // check whether the port is being already used
             var portUsed = _.find(this.model.getLinks(), function(link) {
@@ -180,11 +203,28 @@ rgraph.on('change:signal', function(wire, signal) {
    }
 });
 
+
+var ccc;
+rgraph.on('remove', function(cell) {
+    
+   if (cell.get('joinerTargetId') !== undefined) {
+        var removedLabel = cell.attributes.labels[0].attrs.text.text;
+        // Find target
+        var joiner = rgraph.getCell(cell.get('joinerTargetId'));
+        // Decrement 
+        joiner.set('numConnections', joiner.get('numConnections') - 1);
+        // Re-label
+        _.each(rgraph.getConnectedLinks(joiner, { inbound: true }), function(link) {
+            var currLabel = link.attributes.labels[0].attrs.text.text;
+            if (currLabel > removedLabel) {
+                setLabel(link, currLabel - 1);
+            }
+        });
+   }
+})
+
 $("#simBtn").click(function() {
-    // _.each(rgraph.getLinks(), function(link) {
-    //     //console.log(JSON.stringify(link));
-    //     rgraph.addCell(rpaper.getDefaultLink().set(JSON.stringify(link)));
-    // });
+
     var sequentialLogic = false;
     _.each(rgraph.getElements(), function(element) {
         if (element instanceof joint.shapes.logic.Dff)

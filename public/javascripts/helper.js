@@ -72,6 +72,7 @@ var addGate = function(graph, type, xpos, ypos) {
 
 var busInputGates = ['logic.Mux21_16', 'logic.Splitter'];
 var busOutputGates = ['logic.Mux21_16', 'logic.Joiner'];
+var multiInputGates = ['logic.Joiner'];
 
 var hasBusInput = function(cv) {
     return _.indexOf(busInputGates, cv.model.attributes.type) > -1;
@@ -80,5 +81,14 @@ var hasBusInput = function(cv) {
 var hasBusOutput = function(cv) {
     return _.indexOf(busOutputGates, cv.model.attributes.type) > -1;
 }
+
+var hasMultiInput = function(cv) {
+    return _.indexOf(multiInputGates, cv.model.attributes.type) > -1;
+}
+
+var setLabel = function(link, label) {
+    link.label(0, { position: 0.5, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { stroke: 'black', 'stroke-width': 10, rx: 0, ry: 0 } }});
+}
+
 
 
