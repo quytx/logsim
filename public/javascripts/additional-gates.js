@@ -70,6 +70,12 @@ joint.shapes.logic.Mux21_16 = joint.shapes.logic.Gate31.extend({
 
 });
 
+//////////////////
+
+
+
+///////////////
+
 
 
 joint.shapes.logic.Bus = joint.dia.Link.extend({
@@ -97,7 +103,7 @@ joint.shapes.logic.Bus = joint.dia.Link.extend({
         type: 'logic.Bus',
 
         attrs: {
-            '.connection': { 'stroke-width': 10 },
+            '.connection': { 'stroke-width': 12 },
             '.marker-vertex': { r: 7 }
         },
 

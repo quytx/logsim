@@ -13,6 +13,13 @@ var rpaper = new joint.dia.Paper({
     snapLinks: false,
     linkPinning: false,
     perpendicularLinks: false,
+    // linkView: function(link) {
+    //     if (link instanceof joint.shapes.logic.Bus) {
+    //         return BusLinkView;
+    //     } else {
+    //         return joint.dia.LinkView;
+    //     }
+    // },
     defaultLink: function(cv,m) {
         if (hasBusOutput(cv)) {
             return new joint.shapes.logic.Bus;
@@ -84,6 +91,12 @@ $('#zoomOutBtn').click(function() {
     rpaper.scale(scale.x, scale.y);
 });
 
+
+function reset() {
+    simulateOn = false;
+    timeStep = 0;
+    initializeSignal();
+}
 
 function toggleLive(model, signal) {
     // add 'live' class to the element if there is a positive signal
@@ -157,8 +170,16 @@ function initializeSignal() {
     // < 0 wire with a negative signal means, there is no signal 
     // 0 none of the above - reset value
 
-    // cancel all signals stores in wires
-    _.invoke(rgraph.getLinks(), 'set', 'signal', 0);
+    // cancel all signals stores in buses and wires
+    _.invoke(_.chain(rgraph.getLinks()).reject(function(link) {
+        return !(link instanceof joint.shapes.logic.Wire);
+    }).value(), 'set', 'signal', 0);
+
+    _.invoke(_.chain(rgraph.getLinks()).reject(function(link) {
+        return !(link instanceof joint.shapes.logic.Bus);
+    }).value(), 'set', 'busSignal', undefined);
+
+    // _.invoke(rgraph.getLinks(), 'set', 'signal', 0);
 
     // remove all 'live' classes
     $('.live').each(function() {
@@ -166,7 +187,7 @@ function initializeSignal() {
     });
 
     // If not in simulation mode, return
-    if (!simulateOn) { return signal ; }
+    if (!simulateOn) { return signal; }
 
 
     // Otherwise broadcast signals
@@ -351,20 +372,28 @@ rgraph.on('remove', function(cell) {
 
 $("#simBtn").click(function() {
 
+    simulateOn = true;
+    $("#simBtn").css('visibility', 'hidden');
+    $("#resetBtn").css('visibility', 'visible');
+
     var sequentialLogic = false;
     _.each(rgraph.getElements(), function(element) {
         if (element instanceof joint.shapes.logic.Dff)
             sequentialLogic = true;
     });
 
-    if (!simulateOn) {
-        simulateOn = true;
-        $("#simBtn").remove();
-        if (sequentialLogic) {
-            $("#stepBtn").css('visibility', 'visible');    
-        }
-    } 
-    current = initializeSignal();
+    if (sequentialLogic) {
+        $("#stepBtn").css('visibility', 'visible');    
+    }
+
+    current = initializeSignal();  
+});
+
+$("#resetBtn").click(function() {
+    $("#simBtn").css('visibility', 'visible');
+    $("#resetBtn").css('visibility', 'hidden');
+    reset();
+
 });
 
 $("#stepForward").click(function() {

@@ -37,6 +37,9 @@ a {
     visibility: hidden;
 }
 
+#resetBtn {
+    visibility: hidden;
+}
 #currTimeStep {
     color: red;
 }
