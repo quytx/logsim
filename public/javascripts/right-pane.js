@@ -142,6 +142,14 @@ function incrDff() {
     timeStep++;
 }
 
+// function initializeBusSignal() {
+//     if (!simulateOn) { return; }
+//     _.each(rgraph.getElements(), function(element) {
+//         // broadcast a new signal from every joiner in the rgraph
+//         (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, signal);
+//     });
+// }
+
 function initializeSignal() {
     
     var signal = 1;
@@ -199,11 +207,57 @@ rgraph.on('change:source change:target', function(model, end) {
 rgraph.on('change:busSignal', function(bus, busSignal) {
     // console.log('bus signal changed');
     var gate = rgraph.getCell(bus.get('target').id);
-
     if (gate) {
         if (gate instanceof joint.shapes.logic.Splitter) {
             broadcastSplitter(gate);
-        } 
+        } else {
+            // multi-bus input handle here, e.g. Mux 16
+            // Get all input buses
+            var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
+            .sortBy(function(bus) {
+                return bus.attributes.target.port;
+            })
+            .map(function(bus) {
+                return bus.attributes.busSignal;
+            })
+            .value();
+            
+
+            // Check if all input buses are same length (ANY exception?)
+            var busSize;
+            if (inputs.length > 0) {
+                _.each(inputs, function(bus) {
+                    if (bus !== undefined) {
+                        if (busSize === undefined) {
+                            busSize = bus.length;
+                        } else if (busSize !== bus.length) {
+                            console.error('Error: Bus inputs must be same size');
+                            return;
+                        }
+                    }
+                })
+            }
+            if (busSize === 0) return;
+            
+            // Group each wire in each bus by index
+            var ins = new Array(busSize); 
+            var outs = new Array(busSize);
+            var i, j;
+            for (i = 0; i < busSize; i++) {
+                ins[i] = [];
+                for (j = 0; j < inputs.length; j++) {
+                    if (inputs[j] !== undefined) {
+                        ins[i].push(inputs[j][i] == 1 ? true : false);
+                    }
+                }
+            }
+
+            // Apply operation to each bit of input buses
+            for (i = 0; i < busSize; i++) {
+                outs[i] = gate.operation.apply(gate, ins[i]) ? 1 : -1;
+            }   
+            broadcastBus(gate, outs); 
+        }
    }
 });
 
