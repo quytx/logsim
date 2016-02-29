@@ -45,6 +45,10 @@ var addGate = function(graph, type, xpos, ypos) {
             newGate = new joint.shapes.logic.Dff({ position: { x: xpos, y: ypos}});
             newGate.outQ = undefined;
             newGate.clk = 0;
+            newGate.reset = function() {
+                newGate.outQ = undefined;
+                newGate.clk = 0;
+            }
             newGate.nextTimeStep = function() {
                 var wireIn = rgraph.getConnectedLinks(newGate, { inbound: true });
                 if (wireIn.length > 0) {

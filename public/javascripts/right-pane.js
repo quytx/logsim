@@ -91,10 +91,16 @@ $('#zoomOutBtn').click(function() {
     rpaper.scale(scale.x, scale.y);
 });
 
+function resetFlipFlops() {
+    _.each(rgraph.getElements(), function(element) {
+        (element instanceof joint.shapes.logic.Dff) && element.reset.apply();
+    });
+}
 
 function reset() {
     simulateOn = false;
     timeStep = 0;
+    resetFlipFlops();
     initializeSignal();
 }
 
@@ -131,8 +137,8 @@ function broadcastSplitter(gate) {
             .value();
 
             // Validate input and output size
-            if (outputs.length > inputs.length) {
-                notify('Error: Splitter cannot have more output wires than input wires');
+            if (inputs !== undefined && inputs[0] !== undefined && outputs.length > inputs.length) {
+                notify('Error: Splitter cannot have more output wires (' + outputs.length + ')than input wires (' + inputs.length + ')');
                 return;
             }
 
@@ -215,7 +221,6 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 var current = {};
 
 rgraph.on('change:source change:target', function(model, end) {
-
     var e = 'target' in model.changed ? 'target' : 'source';
 
     if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
@@ -227,6 +232,7 @@ rgraph.on('change:source change:target', function(model, end) {
 
 rgraph.on('change:busSignal', function(bus, busSignal) {
     // console.log('bus signal changed');
+    
     var gate = rgraph.getCell(bus.get('target').id);
     if (gate) {
         if (gate instanceof joint.shapes.logic.Splitter) {
@@ -284,6 +290,7 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
 
 rgraph.on('change:signal', function(wire, signal) {
     // console.log('wire signal changed');
+
     toggleLive(wire, signal);
 
     var magnitude = Math.abs(signal);
@@ -330,6 +337,7 @@ rgraph.on('change:signal', function(wire, signal) {
 });
 
 rgraph.on('change', function(cell) {
+
     if (cell.get('joinerTargetId') !== undefined && cell.attributes.labels === undefined) {
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
@@ -342,6 +350,7 @@ rgraph.on('change', function(cell) {
 
 
 rgraph.on('remove', function(cell) {
+
     if (cell.get('joinerTargetId') !== undefined) {
         var removedLabel = cell.attributes.labels[0].attrs.text.text;
         // Find target
@@ -392,6 +401,8 @@ $("#simBtn").click(function() {
 $("#resetBtn").click(function() {
     $("#simBtn").css('visibility', 'visible');
     $("#resetBtn").css('visibility', 'hidden');
+    $("#stepBtn").css('visibility', 'hidden');
+    $("#currTimeStep").html(0);
     reset();
 
 });
