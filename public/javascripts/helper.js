@@ -70,6 +70,10 @@ var addGate = function(graph, type, xpos, ypos) {
     graph.addCell(newGate);
 }
 
+var notify = function(text, type) {
+    $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 8000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
+}
+
 var busInputGates = ['logic.Mux21_16', 'logic.Splitter'];
 var busOutputGates = ['logic.Mux21_16', 'logic.Joiner'];
 var multiInputGates = ['logic.Joiner'];

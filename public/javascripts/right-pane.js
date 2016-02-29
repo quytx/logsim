@@ -103,7 +103,7 @@ function broadcastSplitter(gate) {
     if (gate.attributes.type === 'logic.Splitter') {
         var busIn = rgraph.getConnectedLinks(gate, { inbound: true});
         if (busIn.length > 1) {
-            console.error("Error: Splitter cannot have more than 1 input bus");
+            notify("Error: Splitter cannot have more than 1 input bus");
             return;
         }
         if (busIn[0] !== undefined) {
@@ -119,7 +119,7 @@ function broadcastSplitter(gate) {
 
             // Validate input and output size
             if (outputs.length > inputs.length) {
-                console.error('Error: Splitter cannot have more output wires than input wires');
+                notify('Error: Splitter cannot have more output wires than input wires');
                 return;
             }
 
@@ -231,7 +231,7 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
                         if (busSize === undefined) {
                             busSize = bus.length;
                         } else if (busSize !== bus.length) {
-                            console.error('Error: Bus inputs must be same size');
+                            notify('Error: Bus inputs must be same size');
                             return;
                         }
                     }
