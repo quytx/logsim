@@ -1,7 +1,10 @@
 //var demo = false;
 var simulateOn = false;
 var timeStep = 0;
+// Graph option
 var scale = { x: 1, y: 1, rate: 1.1 };
+var gridSize = 8;
+var gridColor = 'lightgrey';
 
 var rgraph = new joint.dia.Graph();
 
@@ -9,7 +12,7 @@ var rpaper = new joint.dia.Paper({
 
     el: $('#paper'),
     model: rgraph,
-    width: 1260, height: 800, gridSize: 5,
+    width: 1260, height: 800, gridSize: gridSize,
     snapLinks: false,
     linkPinning: false,
     perpendicularLinks: false,
@@ -68,6 +71,10 @@ var rpaper = new joint.dia.Paper({
         }
     }
 });
+
+
+// grid lines
+setGrid(rpaper, gridSize, gridColor);
 
 // scale
 rpaper.scale(scale.x, scale.y);
@@ -138,7 +145,7 @@ function broadcastSplitter(gate) {
 
             // Validate input and output size
             if (inputs !== undefined && inputs[0] !== undefined && outputs.length > inputs.length) {
-                notify('Error: Splitter cannot have more output wires (' + outputs.length + ')than input wires (' + inputs.length + ')');
+                notify('Error: Splitter cannot have more output wires (' + outputs.length + ') than input wires (' + inputs.length + ')');
                 return;
             }
 
@@ -183,7 +190,7 @@ function initializeSignal() {
 
     _.invoke(_.chain(rgraph.getLinks()).reject(function(link) {
         return !(link instanceof joint.shapes.logic.Bus);
-    }).value(), 'set', 'busSignal', undefined);
+    }).value(), 'unset', 'busSignal');
 
     // _.invoke(rgraph.getLinks(), 'set', 'signal', 0);
 

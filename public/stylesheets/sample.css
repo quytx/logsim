@@ -98,7 +98,8 @@
 
 .link.live > .connection {
     /* stroke: #7c68fc; */
-    stroke: #A94442;
+    /*stroke: #A94442;*/
+    stroke: red;
     //stroke-width: 3px;
 }
 

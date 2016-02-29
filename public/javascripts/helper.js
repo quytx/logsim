@@ -98,5 +98,31 @@ var setLabel = function(link, label) {
     link.label(0, { position: 0.5, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { stroke: 'black', 'stroke-width': 10, rx: 0, ry: 0 } }});
 }
 
+// Source: http://stackoverflow.com/questions/34577581/how-to-enable-draw-grid-lines-for-jointjs-graph
+function setGrid(paper, gridSize, color) {
+    // Set grid size on the JointJS paper object (joint.dia.Paper instance)
+    paper.options.gridSize = gridSize;
+    // Draw a grid into the HTML 5 canvas and convert it to a data URI image
+    var canvas = $('<canvas/>', { width: gridSize, height: gridSize });
+    canvas[0].width = gridSize;
+    canvas[0].height = gridSize;
+    var context = canvas[0].getContext('2d');
+    context.beginPath();
+    context.rect(1, 1, 1, 1);
+    context.fillStyle = color || '#AAAAAA';
+    context.fill();
+    // Finally, set the grid background image of the paper container element.
+    var gridBackgroundImage = canvas[0].toDataURL('image/png');
+    paper.$el.css('background-image', 'url("' + gridBackgroundImage + '")');
+}
+
+function setError(gate, text) {
+    gate.set('errMsg', text);
+}
+
+function clearError(gate) {
+    gate.unset('errMsg');
+}
+
 
 
