@@ -290,6 +290,7 @@ rgraph.on('remove', function(cell) {
             }
         });
     }
+    current = initializeSignal();
 })
 
 
