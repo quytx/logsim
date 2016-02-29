@@ -95,6 +95,43 @@ function broadcastSignal(gate, signal) {
     _.defer(_.invoke, rgraph.getConnectedLinks(gate, { outbound: true }), 'set', 'signal', signal);
 }
 
+function broadcastBus(gate, busSignal) {
+    _.defer(_.invoke, rgraph.getConnectedLinks(gate, { outbound: true }), 'set', 'busSignal', busSignal);
+}
+
+function broadcastSplitter(gate) {
+    if (gate.attributes.type === 'logic.Splitter') {
+        var busIn = rgraph.getConnectedLinks(gate, { inbound: true});
+        if (busIn.length > 1) {
+            console.error("Error: Splitter cannot have more than 1 input bus");
+            return;
+        }
+        if (busIn[0] !== undefined) {
+            // Get input
+            var inputs = busIn[0].attributes.busSignal;
+            // console.log(inputs);
+            // Get sorted list of output
+            var outputs = _.chain(rgraph.getConnectedLinks(gate, { outbound: true}))
+            .sortBy(function(output) {
+                return output.attributes.labels[0].attrs.text.text;
+            })
+            .value();
+
+            // Validate input and output size
+            if (outputs.length > inputs.length) {
+                console.error('Error: Splitter cannot have more output wires than input wires');
+                return;
+            }
+
+            // Map input bus signal to each output
+            _.each(inputs, function(signal, index) {
+                _.defer(_.invoke, [outputs[index]], 'set', 'signal', signal);
+            });
+
+        }      
+    }
+}
+
 function incrDff() {
     _.each(rgraph.getElements(), function(element) {
         (element instanceof joint.shapes.logic.Dff) && element.nextTimeStep.apply();
@@ -158,8 +195,20 @@ rgraph.on('change:source change:target', function(model, end) {
     }
 });
 
-rgraph.on('change:signal', function(wire, signal) {
 
+rgraph.on('change:busSignal', function(bus, busSignal) {
+    // console.log('bus signal changed');
+    var gate = rgraph.getCell(bus.get('target').id);
+
+    if (gate) {
+        if (gate instanceof joint.shapes.logic.Splitter) {
+            broadcastSplitter(gate);
+        } 
+   }
+});
+
+rgraph.on('change:signal', function(wire, signal) {
+    // console.log('wire signal changed');
     toggleLive(wire, signal);
 
     var magnitude = Math.abs(signal);
@@ -170,27 +219,38 @@ rgraph.on('change:signal', function(wire, signal) {
     var gate = rgraph.getCell(wire.get('target').id);
 
     if (gate) {
+        if (gate instanceof joint.shapes.logic.Joiner) {
 
-        gate.onSignal(signal, function() {
-            // get an array of signals on all input ports
-            var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
-                .sortBy(function(wire) { 
-                    return wire.get('target').port;     // sort all inputs based on labels (in1, in2, ...)
-                })
-                .groupBy(function(wire) {
-                    return wire.get('target').port;
-                })
-                .map(function(wires) {
-                    return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
-                })
-                .value();
-            // calculate the output signal
-            // console.log(inputs);
-            var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
-            
-            broadcastSignal(gate, output);
-        });
-        // }
+            var busIn = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
+            .sortBy(function(input) {
+                return input.attributes.labels[0].attrs.text.text;
+            })
+            .map(function(input) {
+                return input.attributes.signal;
+            })
+            .value();
+            broadcastBus(gate, busIn);
+        } else {
+            gate.onSignal(signal, function() {
+                // get an array of signals on all input ports
+                var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
+                    .sortBy(function(wire) { 
+                        return wire.get('target').port;     // sort all inputs based on labels (in1, in2, ...)
+                    })
+                    .groupBy(function(wire) {
+                        return wire.get('target').port;
+                    })
+                    .map(function(wires) {
+                        return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
+                    })
+                    .value();
+                // calculate the output signal
+                // console.log(inputs);
+                var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
+                
+                broadcastSignal(gate, output);
+            });
+        }
    }
 });
 
