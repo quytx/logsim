@@ -79,7 +79,16 @@
 .element .body {
     /* fill: #68DDD5; 
     stroke: #44CCC3; */
-    fill: #ccc;
+    fill: white;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.element .box {
+    /* fill: #68DDD5; 
+    stroke: #44CCC3; */
+    fill: white;
     stroke: #000;
     stroke-opacity: 0.5;
     transition: all 0.2s;
@@ -93,7 +102,7 @@
 }
 
 .element text {
-    fill: #fff;
+    fill: black;
 }
 
 .link.live > .connection {

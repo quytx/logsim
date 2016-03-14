@@ -40,7 +40,13 @@ var addGate = function(graph, type, xpos, ypos) {
             break;  
         case "logic.Joiner":
             newGate = new joint.shapes.logic.Joiner({ position: { x: xpos, y: ypos}});
-            break;            
+            break;
+        case "logic.SMC":
+            newGate = new joint.shapes.logic.SMC({ position: { x: xpos, y: ypos}});
+            break;  
+        // case "logic.rect":
+        //     newGate = new joint.shapes.logic.rect({ position: { x: xpos, y: ypos}});
+        //     break;                      
         case "logic.Dff":
             newGate = new joint.shapes.logic.Dff({ position: { x: xpos, y: ypos}});
             newGate.outQ = undefined;
@@ -78,25 +84,34 @@ var notify = function(text, type) {
     $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 8000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
 }
 
-var busInputGates = ['logic.Mux21_16', 'logic.Splitter'];
-var busOutputGates = ['logic.Mux21_16', 'logic.Joiner'];
+var busInputGates = ['logic.Mux21_16', 'logic.Splitter', 'logic.SMC'];
+var busOutputGates = ['logic.Mux21_16', 'logic.Joiner', 'logic.SMC'];
 var multiInputGates = ['logic.Joiner'];
+var multiOutputValue = ['logic.SMC'];
 
-var hasBusInput = function(cv) {
-    return _.indexOf(busInputGates, cv.model.attributes.type) > -1;
+var hasBusInput = function(cell) {
+    return _.indexOf(busInputGates, cell.attributes.type) > -1;
 }
 
-var hasBusOutput = function(cv) {
-    return _.indexOf(busOutputGates, cv.model.attributes.type) > -1;
+var hasBusOutput = function(cell) {
+    return _.indexOf(busOutputGates, cell.attributes.type) > -1;
 }
 
-var hasMultiInput = function(cv) {
-    return _.indexOf(multiInputGates, cv.model.attributes.type) > -1;
+var hasMultiInput = function(cell) {
+    return _.indexOf(multiInputGates, cell.attributes.type) > -1;
+}
+
+var hasMultiOutputValues = function(cell) {
+    return _.indexOf(multiOutputValue, cell.attributes.type) > -1;
 }
 
 var setLabel = function(link, label) {
-    link.label(0, { position: 0.5, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { stroke: 'black', 'stroke-width': 10, rx: 0, ry: 0 } }});
+    link.label(0, { position: 0.5, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { fill: 'black', stroke: 'black', 'stroke-width': 8, rx: 0, ry: 0 } }});
 }
+
+
+// Helper Function to label SMC output wires
+//var labelSMC = function(smcCell) 
 
 // Source: http://stackoverflow.com/questions/34577581/how-to-enable-draw-grid-lines-for-jointjs-graph
 function setGrid(paper, gridSize, color) {

@@ -16,15 +16,8 @@ var rpaper = new joint.dia.Paper({
     snapLinks: false,
     linkPinning: false,
     perpendicularLinks: false,
-    // linkView: function(link) {
-    //     if (link instanceof joint.shapes.logic.Bus) {
-    //         return BusLinkView;
-    //     } else {
-    //         return joint.dia.LinkView;
-    //     }
-    // },
     defaultLink: function(cv,m) {
-        if (hasBusOutput(cv)) {
+        if (hasBusOutput(cv.model)) {
             return new joint.shapes.logic.Bus;
         } else {
             return new joint.shapes.logic.Wire;
@@ -35,13 +28,13 @@ var rpaper = new joint.dia.Paper({
 
         if (e === 'target') {
             
-             if (hasBusOutput(vs) != hasBusInput(vt)) return false;   // validate bus connection
+             if (hasBusOutput(vs.model) != hasBusInput(vt.model)) return false;   // validate bus connection
 
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
 
             // Allow multi-input
-            if (hasMultiInput(vt)) {
+            if (hasMultiInput(vt.model)) {
                 // label if target is a joiner
                 if (vt.model.attributes.type === 'logic.Joiner') {                    
                     vl.model.set('joinerTargetId', vt.model.id);
@@ -49,9 +42,19 @@ var rpaper = new joint.dia.Paper({
                 return true;    // no need to check if port already used
             }
 
-            // Label if source is a splitter
+            // Handle multiple output values: Set source ID if source has multiple output values
+            if (hasMultiOutputValues(vs.model)) {
+                vl.model.set('multiOutputSourceId', vs.model.id);
+            }
+
+            // Set source ID if source is a splitter
             if (vs.model.attributes.type === 'logic.Splitter') {
                 vl.model.set('splitterSourceId', vs.model.id);
+            } 
+
+            // Set target ID if target is a SMC
+            if (vt.model.attributes.type === 'logic.SMC') {
+                vl.model.set('smcTargetId', vt.model.id);
             }
 
             // check whether the port is being already used
@@ -155,7 +158,7 @@ function broadcastSplitter(gate) {
             });
 
         }      
-    }
+    } 
 }
 
 function incrDff() {
@@ -178,11 +181,8 @@ function incrDff() {
 
 function initializeSignal() {
     
-    var signal = 1;
-    // > 0 wire with a positive signal is alive
-    // < 0 wire with a negative signal means, there is no signal 
-    // 0 none of the above - reset value
-
+    var signal = 1; // signal is high
+    
     // cancel all signals stores in buses and wires
     _.invoke(_.chain(rgraph.getLinks()).reject(function(link) {
         return !(link instanceof joint.shapes.logic.Wire);
@@ -224,7 +224,6 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 
 // diagramm setup
 
-
 var current = {};
 
 rgraph.on('change:source change:target', function(model, end) {
@@ -241,11 +240,36 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
     // console.log('bus signal changed');
     
     var gate = rgraph.getCell(bus.get('target').id);
+    
     if (gate) {
         if (gate instanceof joint.shapes.logic.Splitter) {
-            broadcastSplitter(gate);
+            broadcastSplitter(gate);    // re-broadcast splitter
+        } else if (hasMultiOutputValues(gate)) {
+            // Handle multiple output values here
+
+            // Rename SMC
+            if (gate instanceof joint.shapes.logic.SMC) {
+                // Rename based on input value
+                if (busSignal !== undefined) {
+                    var name = "";
+                    busSignal.forEach(function(sig) {
+                        if (sig === 1) { name = name.concat("1"); }
+                        else { name = name.concat("0"); }
+                    }) 
+                    gate.attr('text/text', name);
+                } else {
+                    gate.attr('text/text', 'SMC');
+                }
+            }
+
+
+            // Broadcast (multiple) outputs
+            // To-do
+
+
+        
         } else {
-            // multi-bus input handle here, e.g. Mux 16
+            // multi-bus input with 1 output handle here, e.g. Mux 16
             // Get all input buses
             var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
             .sortBy(function(bus) {
@@ -343,8 +367,8 @@ rgraph.on('change:signal', function(wire, signal) {
    }
 });
 
+// Handle labeling (potentially other actions if needed) when a new wire/bus is added from a gate
 rgraph.on('change', function(cell) {
-
     if (cell.get('joinerTargetId') !== undefined && cell.attributes.labels === undefined) {
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
@@ -352,6 +376,21 @@ rgraph.on('change', function(cell) {
     } else if (cell.get('splitterSourceId') !== undefined && cell.attributes.labels === undefined) {
         var splitter = rgraph.getCell(cell.get('splitterSourceId'));
         setLabel(cell, rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1);
+    } else if (cell.get('multiOutputSourceId') !== undefined && cell.attributes.labels === undefined) {
+        var source = rgraph.getCell(cell.get('multiOutputSourceId'));
+        // get currently used labels
+        var usedLabels = _.map(rgraph.getConnectedLinks(source, { outbound: true }), function(link){
+            if (link.attributes.labels === undefined) return undefined;
+            return link.attributes.labels[0].attrs.text.text;
+        });
+        // find first unused label
+        var unusedLabels = _.difference(source.outputsList.apply(source), usedLabels);
+        if (unusedLabels !== undefined && unusedLabels.length > 0) {
+            setLabel(cell, unusedLabels[0]);
+        } else if (unusedLabels.length == 0) {
+            // Remove immediately if reached maximum number of outputs
+            cell.remove();
+        }
     }
 })
 
@@ -362,7 +401,7 @@ rgraph.on('remove', function(cell) {
         var removedLabel = cell.attributes.labels[0].attrs.text.text;
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
-        // Re-label links with higher label
+        // Re-label links with higher number
         _.each(rgraph.getConnectedLinks(joiner, { inbound: true }), function(link) {
             var currLabel = link.attributes.labels[0].attrs.text.text;
             if (currLabel > removedLabel) {
@@ -373,7 +412,7 @@ rgraph.on('remove', function(cell) {
         var removedLabel = cell.attributes.labels[0].attrs.text.text;
         // Find source
         var splitter = rgraph.getCell(cell.get('splitterSourceId'));
-        // Re-label links with higher label
+        // Re-label links with higher number
         _.each(rgraph.getConnectedLinks(splitter, { outbound: true }), function(link) {
             var currLabel = link.attributes.labels[0].attrs.text.text;
             if (currLabel > removedLabel) {
