@@ -5,6 +5,8 @@ var timeStep = 0;
 var scale = { x: 1, y: 1, rate: 1.1 };
 var gridSize = 8;
 var gridColor = 'lightgrey';
+var LBL_LEFT_POS = 0.2;
+var LBL_RIGHT_POS = 0.8;
 
 var rgraph = new joint.dia.Graph();
 
@@ -33,18 +35,21 @@ var rpaper = new joint.dia.Paper({
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
 
-            // Allow multi-input
-            if (hasMultiInput(vt.model)) {
-                // label if target is a joiner
-                if (vt.model.attributes.type === 'logic.Joiner') {                    
-                    vl.model.set('joinerTargetId', vt.model.id);
-                }
-                return true;    // no need to check if port already used
-            }
-
             // Handle multiple output values: Set source ID if source has multiple output values
             if (hasMultiOutputValues(vs.model)) {
                 vl.model.set('multiOutputSourceId', vs.model.id);
+            }
+
+            // Set target ID if target is a SMC
+            if (vt.model.attributes.type === 'logic.SMC') {
+                vl.model.set('smcTargetId', vt.model.id);
+            }
+
+            // set both sourceID and targetID if a link between joiner and splitter for labeling purpose
+            // .set method will trigger "onchange" event immediately
+            if (vs.model.attributes.type === 'logic.Splitter' && vt.model.attributes.type === 'logic.Joiner') {
+                var sjId = [vs.model.id, vt.model.id];
+                vl.model.set('sjId', sjId); // trigger another event immediately, delay the next codes
             }
 
             // Set source ID if source is a splitter
@@ -52,9 +57,13 @@ var rpaper = new joint.dia.Paper({
                 vl.model.set('splitterSourceId', vs.model.id);
             } 
 
-            // Set target ID if target is a SMC
-            if (vt.model.attributes.type === 'logic.SMC') {
-                vl.model.set('smcTargetId', vt.model.id);
+            // Allow multi-input
+            if (hasMultiInput(vt.model)) {
+                // label if target is a joiner
+                if (vt.model.attributes.type === 'logic.Joiner') {                    
+                    vl.model.set('joinerTargetId', vt.model.id);
+                }
+                return true;    // no need to check if port already used
             }
 
             // check whether the port is being already used
@@ -336,7 +345,8 @@ rgraph.on('change:signal', function(wire, signal) {
 
             var busIn = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
             .sortBy(function(input) {
-                return input.attributes.labels[0].attrs.text.text;
+                var i =  (input.get('sjId') === undefined) ? 0 : 1;
+                return input.attributes.labels[i].attrs.text.text;
             })
             .map(function(input) {
                 return input.attributes.signal;
@@ -369,13 +379,22 @@ rgraph.on('change:signal', function(wire, signal) {
 
 // Handle labeling (potentially other actions if needed) when a new wire/bus is added from a gate
 rgraph.on('change', function(cell) {
-    if (cell.get('joinerTargetId') !== undefined && cell.attributes.labels === undefined) {
+    if (cell.get('sjId') !== undefined && cell.attributes.labels === undefined) {
+        var splitter = rgraph.getCell(cell.get('sjId')[0]);
+        var joiner = rgraph.getCell(cell.get('sjId')[1]);
+        // var lbl = '';
+        // lbl = lbl.concat(rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1).concat(' : ').concat(rgraph.getConnectedLinks(joiner, { inbound: true }).length);
+        // setLabel(cell, lbl, 0);
+        setLabel(cell, rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1, 0, LBL_LEFT_POS);
+        setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length, 1, LBL_RIGHT_POS);
+    }
+    else if (cell.get('joinerTargetId') !== undefined && cell.attributes.labels === undefined) {
         // Find target
         var joiner = rgraph.getCell(cell.get('joinerTargetId'));
-        setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length);
+        setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length, 0, LBL_RIGHT_POS);
     } else if (cell.get('splitterSourceId') !== undefined && cell.attributes.labels === undefined) {
         var splitter = rgraph.getCell(cell.get('splitterSourceId'));
-        setLabel(cell, rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1);
+        setLabel(cell, rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1, 0, LBL_LEFT_POS);
     } else if (cell.get('multiOutputSourceId') !== undefined && cell.attributes.labels === undefined) {
         var source = rgraph.getCell(cell.get('multiOutputSourceId'));
         // get currently used labels
@@ -386,7 +405,7 @@ rgraph.on('change', function(cell) {
         // find first unused label
         var unusedLabels = _.difference(source.outputsList.apply(source), usedLabels);
         if (unusedLabels !== undefined && unusedLabels.length > 0) {
-            setLabel(cell, unusedLabels[0]);
+            setLabel(cell, unusedLabels[0], 0, LBL_LEFT_POS);
         } else if (unusedLabels.length == 0) {
             // Remove immediately if reached maximum number of outputs
             cell.remove();
@@ -396,29 +415,49 @@ rgraph.on('change', function(cell) {
 
 
 rgraph.on('remove', function(cell) {
+    if (cell.isLink()) {
+        var rmValues,rmVal,splitter,joiner;
 
-    if (cell.get('joinerTargetId') !== undefined) {
-        var removedLabel = cell.attributes.labels[0].attrs.text.text;
-        // Find target
-        var joiner = rgraph.getCell(cell.get('joinerTargetId'));
-        // Re-label links with higher number
-        _.each(rgraph.getConnectedLinks(joiner, { inbound: true }), function(link) {
-            var currLabel = link.attributes.labels[0].attrs.text.text;
-            if (currLabel > removedLabel) {
-                setLabel(link, currLabel - 1);
-            }
-        });
-    } else if (cell.get('splitterSourceId') !== undefined) {
-        var removedLabel = cell.attributes.labels[0].attrs.text.text;
-        // Find source
-        var splitter = rgraph.getCell(cell.get('splitterSourceId'));
-        // Re-label links with higher number
-        _.each(rgraph.getConnectedLinks(splitter, { outbound: true }), function(link) {
-            var currLabel = link.attributes.labels[0].attrs.text.text;
-            if (currLabel > removedLabel) {
-                setLabel(link, currLabel - 1);
-            }
-        });
+        if (cell.get('sjId') !== undefined) {
+            rmValues = _.map(cell.attributes.labels, function(lb) { return lb.attrs.text.text });
+            splitter = rgraph.getCell(cell.get('sjId')[0]);
+            joiner = rgraph.getCell(cell.get('sjId')[1]);
+        }
+        else if (cell.get('joinerTargetId') !== undefined) {
+            rmValues = [cell.attributes.labels[0].attrs.text.text];
+            // Find target
+            joiner = rgraph.getCell(cell.get('joinerTargetId'));
+        } else if (cell.get('splitterSourceId') !== undefined) {
+            var rmValues = [cell.attributes.labels[0].attrs.text.text];
+            // Find source
+            splitter = rgraph.getCell(cell.get('splitterSourceId'));
+        }
+
+        // Re-label
+
+        if (splitter !== undefined) {
+            rmVal = rmValues[0];
+            // console.log('removed from splitter: ' + rmVal );
+            _.each(rgraph.getConnectedLinks(splitter, { outbound: true }), function(link) {
+                var currLabel = link.attributes.labels[0].attrs.text.text;
+                if (currLabel > rmVal) {
+                    setLabel(link, currLabel - 1, 0, LBL_LEFT_POS);
+                }
+            });
+        }
+
+        if (joiner !== undefined) {
+            rmVal = rmValues.length === 2 ? rmValues[1] : rmValues[0];
+            // console.log('removed from joiner: ' + rmVal );
+            _.each(rgraph.getConnectedLinks(joiner, { inbound: true }), function(link) {
+                var i = (link.get('sjId') !== undefined) ? 1 : 0;
+                var currLabel = link.attributes.labels[i].attrs.text.text;
+                if (currLabel > rmVal) {
+                    setLabel(link, currLabel - 1, i, LBL_RIGHT_POS);
+                }
+            });
+        }
+
     }
     current = initializeSignal();
 })

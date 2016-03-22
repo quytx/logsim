@@ -147,7 +147,7 @@ joint.shapes.logic.Splitter = joint.shapes.logic.Gate11.extend({
 
 // State Machine Controller
 joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
-    markup: '<g class="rotatable"><g class="scalable"><rect class="box"/></g><text/><circle class="input"/><circle class="output"/></g>',
+    markup: '<g class="rotatable"><g class="scalable"><rect class="box"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="output"/></g>',
 
     defaults: joint.util.deepSupplement({
 
@@ -159,12 +159,13 @@ joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
             },
             '.box': { width: 100, height: 50 },
             circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
-            '.input': { ref: '.box', 'ref-x': -2, 'ref-y': 0.5, magnet: 'passive', port: 'in' },
+            '.input1': { ref: '.box', 'ref-x': -2, 'ref-y': 0.3, magnet: 'passive', port: 'in1' },  // for state number (5-bit)
+            '.input2': { ref: '.box', 'ref-x': -2, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for input bus
             '.output': { ref: '.box', 'ref-dx': 2, 'ref-y': 0.5, magnet: true, port: 'out' }
         }
 
     }, joint.shapes.logic.Gate.prototype.defaults),
-
+    
     outputsList: function() {
         return ['PC_sel', 'PC_we', 'INST_we', 'REG_sel', 'REG_we', 'OFF_we', 'OFF_sel', 'REG2_we', 'RF_sel', 'RF_we', 'VAL1_we', 'VAL2_we', 'VAL2_sel', 'ADDR_we', 'A_sel', 'B_sel', 'ALU_op', 'RAM_we', 'SREG_we', 'VAL_sel', 'VAL_we' ];
     }

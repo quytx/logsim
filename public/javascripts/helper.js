@@ -105,8 +105,9 @@ var hasMultiOutputValues = function(cell) {
     return _.indexOf(multiOutputValue, cell.attributes.type) > -1;
 }
 
-var setLabel = function(link, label) {
-    link.label(0, { position: 0.5, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { fill: 'black', stroke: 'black', 'stroke-width': 8, rx: 0, ry: 0 } }});
+var setLabel = function(link, label, index, optionalPos) {
+    var pos = optionalPos === undefined ? 0.5 : optionalPos;
+    link.label(index, { position: pos, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { fill: 'black', stroke: 'black', 'stroke-width': 8, rx: 0, ry: 0 } }});
 }
 
 
