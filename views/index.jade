@@ -9,7 +9,9 @@ block content
     a.btn-md(id="loadBtn" onclick="loadGraph()") 
       button.btn-md.btn-primary
         i.fa.fa-folder-open-o  Load  
-    
+    a.btn-md(id="clearBtn" onclick="clearGraph()") 
+      button.btn-md.btn-danger
+        i.fa.fa-trash  Clear
     
   div(id="mainBody" ng-controller="SimController")
     h1= title

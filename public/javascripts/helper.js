@@ -196,4 +196,9 @@ function loadGraph() {
     notify("Successfully loaded!", 'success');
 }
 
+function clearGraph() {
+    rgraph.clear();
+    notify("Cleared!", 'success');
+}
+
 document.getElementById('files').addEventListener('change', handleFileSelect, false);

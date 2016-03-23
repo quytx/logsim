@@ -16,7 +16,7 @@ var rpaper = new joint.dia.Paper({
 
     el: $('#paper'),
     model: rgraph,
-    width: 1260, height: 800, gridSize: gridSize,
+    width: 2560, height: 1600, gridSize: gridSize,
     snapLinks: false,
     linkPinning: false,
     perpendicularLinks: false,

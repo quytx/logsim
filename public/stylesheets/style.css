@@ -28,6 +28,7 @@ body {
 
 #paper {
     border: solid 1px black;
+    overflow: scroll;
 }
 
 a {
@@ -35,6 +36,10 @@ a {
 }
 
 #loadBtn {
+    margin-left: 1ex;
+}
+
+#clearBtn {
     margin-left: 1ex;
 }
 
