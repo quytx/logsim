@@ -42,30 +42,7 @@ var rpaper = new joint.dia.Paper({
                 return false;
             }
 
-            // Register WE
-            // if (vt.model.attributes.type === 'logic.Register' && )
-
-            // Handle multiple output values: Set source ID if source has multiple output values
-            // if (hasMultiOutputValues(vs.model)) {
-            //     vl.model.set('multiOutputSourceId', vs.model.id);
-            // }
-
-            // Set target ID if target is a SMC
-            // if (vt.model.attributes.type === SMC) {
-            //     vl.model.set('smcTargetId', vt.model.id);
-            // }
-
-            // set both sourceID and targetID if a link between joiner and splitter for labeling purpose
-            // .set method will trigger "onchange" event immediately
-            // if (vs.model.attributes.type === SPLITTER && vt.model.attributes.type === JOINER) {
-            //     var sjId = [vs.model.id, vt.model.id];
-            //     vl.model.set('sjId', sjId); // trigger another event immediately, delay the next codes
-            // }
-
-            // Set source ID if source is a splitter
-            // if (vs.model.attributes.type === SPLITTER) {
-            //     vl.model.set('splitterSourceId', vs.model.id);
-            // } 
+            // Set source & target ID to retrieve after removing
             vl.model.set('sourceId', vs.model.id);
             vl.model.set('targetId', vt.model.id);
 
@@ -74,7 +51,6 @@ var rpaper = new joint.dia.Paper({
 
             // check whether the port is being already used
             var portUsed = _.find(this.model.getLinks(), function(link) {
-
                 return (link.id !== vl.model.id &&
                         link.get('target').id === vt.model.id &&
                         link.get('target').port === mt.getAttribute('port')); 
