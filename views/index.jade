@@ -1,7 +1,12 @@
 extends layout
 
 block content
-  div(ng-controller="SimController")
+  button.btn-md(id="saveBtn") 
+    i.fa.fa-floppy-o  Save
+  |  
+  button.btn-md(id="loadBtn") 
+    i.fa.fa-folder-open-o  Load
+  div(id="mainBody" ng-controller="SimController")
     h1= title
       |  
       button.btn-md.btn-success(id="simBtn")
