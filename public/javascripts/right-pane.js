@@ -2,8 +2,10 @@
 var simulateOn = false;
 var timeStep = 0;
 // Graph option
-var scale = { x: 1, y: 1, rate: 1.1 };
-var gridSize = 8;
+var scale = { x: 0.8, y: 0.8, rate: 1.1 };
+var width = 1260;
+var height = 900;
+var gridSize = 6;
 var gridColor = 'lightgrey';
 var LBL_LEFT_POS = 0.2;
 var LBL_RIGHT_POS = 0.8;
@@ -16,7 +18,7 @@ var rpaper = new joint.dia.Paper({
 
     el: $('#paper'),
     model: rgraph,
-    width: 2560, height: 1600, gridSize: gridSize,
+    width: width, height: height, gridSize: gridSize,
     snapLinks: false,
     linkPinning: false,
     perpendicularLinks: false,
@@ -72,6 +74,18 @@ setGrid(rpaper, gridSize, gridColor);
 
 // scale
 rpaper.scale(scale.x, scale.y);
+
+rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
+    var bbox = cellView.getBBox();
+    var constrained = false;
+    var constrainedX = x;
+    if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
+    if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
+    var constrainedY = y;
+    if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
+    if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
+    if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
+});
 
 // Resize paper to fit outter div
 var mainDiv = document.getElementById('right-col');

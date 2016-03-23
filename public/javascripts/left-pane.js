@@ -3,7 +3,7 @@ var lgraph = new joint.dia.Graph();
 var lpaper = new joint.dia.Paper({
     el: $('#left-col'),
     model: lgraph,
-    width: 300, height: 814, gridSize: 5,
+    width: 300, height: 1000, gridSize: 5,
     snapLinks: false,
     linkPinning: false,
     interactive: false,
