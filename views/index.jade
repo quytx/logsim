@@ -1,13 +1,16 @@
 extends layout
 
 block content
-  div(id="file")
+  div(id="fileDiv")
+    input(type="file" accept=".json" id="files" name="files[]" ) 
     a.btn-md(id="saveBtn" onclick="saveGraph(this)") 
-      button.btn-md
+      button.btn-md.btn-primary
         i.fa.fa-floppy-o  Save
     a.btn-md(id="loadBtn" onclick="loadGraph()") 
-      button.btn-md
-        i.fa.fa-folder-open-o  Load
+      button.btn-md.btn-primary
+        i.fa.fa-folder-open-o  Load  
+    
+    
   div(id="mainBody" ng-controller="SimController")
     h1= title
       |  

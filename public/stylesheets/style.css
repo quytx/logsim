@@ -1,5 +1,6 @@
 body {
     padding: 50px;
+    padding-top: 20px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -35,6 +36,10 @@ a {
 
 #loadBtn {
     margin-left: 1ex;
+}
+
+#files {
+    margin-bottom: 1ex;
 }
 
 a#loadBtn {

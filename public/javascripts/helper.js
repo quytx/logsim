@@ -164,8 +164,32 @@ function clearError(gate) {
     gate.unset('errMsg');
 }
 
+var file,reader,graphJSON;
+
+function handleFileSelect(evt) {
+    if (typeof window.FileReader !== 'function') {
+        alert("This browser doesn't support file API.");
+        return;
+    }
+    file = evt.target.files[0]; // FileList object
+    reader = new FileReader();
+    reader.onload = (function(theFile) {
+        return function(e) {
+            graphJSON = JSON.parse(e.target.result);
+        };
+    })(file);
+    reader.readAsText(file);
+}
+
 function saveGraph(btn) {
     var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(rgraph.toJSON()));
     btn.setAttribute("href", "data:" + data);
     btn.setAttribute("download", "my_circuit.json");
 }
+
+function loadGraph() {
+    if (graphJSON === undefined) return;
+    rgraph.fromJSON(graphJSON);
+}
+
+document.getElementById('files').addEventListener('change', handleFileSelect, false);
