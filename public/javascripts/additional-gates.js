@@ -147,7 +147,7 @@ joint.shapes.logic.Splitter = joint.shapes.logic.Gate11.extend({
 
 // State Machine Controller
 joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
-    markup: '<g class="rotatable"><g class="scalable"><rect class="box"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="output"/></g>',
+    markup: '<g class="rotatable"><g class="scalable"><rect class="box"/></g><text/><circle class="input1"/><circle class="output"/></g>',
 
     defaults: joint.util.deepSupplement({
 
@@ -159,8 +159,8 @@ joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
             },
             '.box': { width: 100, height: 50 },
             circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
-            '.input1': { ref: '.box', 'ref-x': -2, 'ref-y': 0.3, magnet: 'passive', port: 'in1' },  // for state number (5-bit)
-            '.input2': { ref: '.box', 'ref-x': -2, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for input bus
+            '.input1': { ref: '.box', 'ref-x': -2, 'ref-y': 0.5, magnet: 'passive', port: 'in1' },  // for state number (5-bit)
+            // '.input2': { ref: '.box', 'ref-x': -2, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for input bus
             '.output': { ref: '.box', 'ref-dx': 2, 'ref-y': 0.5, magnet: true, port: 'out' }
         }
 

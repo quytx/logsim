@@ -7,6 +7,7 @@ var gridSize = 8;
 var gridColor = 'lightgrey';
 var LBL_LEFT_POS = 0.2;
 var LBL_RIGHT_POS = 0.8;
+var NUM_STATE_BIT = 5;
 
 var rgraph = new joint.dia.Graph();
 
@@ -261,10 +262,10 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
                 // Rename based on input value
                 if (busSignal !== undefined) {
                     var name = "";
-                    busSignal.forEach(function(sig) {
-                        if (sig === 1) { name = name.concat("1"); }
+                    for (var i = 0; i < Math.min(busSignal.length, NUM_STATE_BIT); i++) {
+                        if (busSignal[i] === 1) { name = name.concat("1"); }
                         else { name = name.concat("0"); }
-                    }) 
+                    }
                     gate.attr('text/text', name);
                 } else {
                     gate.attr('text/text', 'SMC');
@@ -273,7 +274,7 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
 
 
             // Broadcast (multiple) outputs
-            // To-do
+            // To-do: extract first 5 bits
 
 
         
@@ -410,6 +411,8 @@ rgraph.on('change', function(cell) {
             // Remove immediately if reached maximum number of outputs
             cell.remove();
         }
+    } else if (cell.get('smcTargetId') !== undefined && cell.attributes.labels === undefined) {
+        setLabel(cell, 'inst_in', 0, LBL_RIGHT_POS);
     }
 })
 
