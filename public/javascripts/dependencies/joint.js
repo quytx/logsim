@@ -12062,7 +12062,7 @@ joint.shapes.logic.Input = joint.shapes.logic.IO.extend({
         attrs: {
             '.wire': { 'ref-dx': 0, d: 'M 0 0 L 23 0' },
             circle: { ref: '.body', 'ref-dx': 30, 'ref-y': 0.5, magnet: true, 'class': 'output', port: 'out' },
-            text: { text: 'input' }
+            text: { text: 'high' }
         }
 
     }, joint.shapes.logic.IO.prototype.defaults)
