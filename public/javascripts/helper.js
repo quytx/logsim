@@ -164,5 +164,8 @@ function clearError(gate) {
     gate.unset('errMsg');
 }
 
-
-
+function saveGraph(btn) {
+    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(rgraph.toJSON()));
+    btn.setAttribute("href", "data:" + data);
+    btn.setAttribute("download", "my_circuit.json");
+}

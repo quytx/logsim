@@ -1,11 +1,13 @@
 extends layout
 
 block content
-  button.btn-md(id="saveBtn") 
-    i.fa.fa-floppy-o  Save
-  |  
-  button.btn-md(id="loadBtn") 
-    i.fa.fa-folder-open-o  Load
+  div(id="file")
+    a.btn-md(id="saveBtn" onclick="saveGraph(this)") 
+      button.btn-md
+        i.fa.fa-floppy-o  Save
+    a.btn-md(id="loadBtn" onclick="loadGraph()") 
+      button.btn-md
+        i.fa.fa-folder-open-o  Load
   div(id="mainBody" ng-controller="SimController")
     h1= title
       |  

@@ -33,6 +33,18 @@ a {
     color: #00B7FF;
 }
 
+#loadBtn {
+    margin-left: 1ex;
+}
+
+a#loadBtn {
+    color: inherit;
+}
+
+a#saveBtn {
+    color: inherit;
+}
+
 #zoomBtn {
     float: right;
 }
