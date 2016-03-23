@@ -192,4 +192,7 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
         }
 
     }, joint.shapes.logic.Gate.prototype.defaults),
+
+    dIn: 'in1',
+    we: 'in2'
 });

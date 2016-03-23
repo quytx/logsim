@@ -84,9 +84,11 @@ var addGate = function(graph, type, xpos, ypos) {
 }
 
 var notify = function(text, type) {
-    $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 8000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
+    $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 5000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
 }
 
+var WIRE = 'logic.Wire';
+var BUS = 'logic.Bus';
 var SPLITTER = 'logic.Splitter';
 var JOINER = 'logic.Joiner';
 var SMC = 'logic.SMC';

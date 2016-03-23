@@ -37,6 +37,11 @@ var rpaper = new joint.dia.Paper({
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
 
+            if (vl.model.attributes.type === BUS && vt.model.attributes.type === REG && mt.getAttribute('port') === vt.model.we) {
+                notify('Write-enable input must be a single bit', 'warning');
+                return false;
+            }
+
             // Register WE
             // if (vt.model.attributes.type === 'logic.Register' && )
 
@@ -403,6 +408,9 @@ rgraph.on('change', function(cell) {
             }
         } else if (target !== null && target.attributes.type === SMC && hasNoLabel(cell, LBL_RIGHT_POS)) {
             setLabel(cell, 'inst_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (target !== null && target.attributes.type === REG && hasNoLabel(cell, LBL_RIGHT_POS)) {
+            if (cell.attributes.target.port === target.dIn ) setLabel(cell, 'd_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+            if (cell.attributes.target.port === target.we ) setLabel(cell, 'we', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
         }
     }
 })
