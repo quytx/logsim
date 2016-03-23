@@ -48,8 +48,8 @@ var lgates = {
     mux21_16: new joint.shapes.logic.Mux21_16({ position: { x: defaultXr, y: defaultY + 5 * gapY }}),
     joiner: new joint.shapes.logic.Joiner({ position: { x: defaultX, y: defaultY + 6 * gapY }}),
     splitter: new joint.shapes.logic.Splitter({ position: { x: defaultXr, y: defaultY + 6 * gapY }}),
-    smc: new joint.shapes.logic.SMC({ position: { x: defaultX, y: defaultY + 7 * gapY }})
-    // rect: new joint.shapes.logic.rect({ position: { x: defaultXr, y: defaultY + 7 * gapY }})
+    smc: new joint.shapes.logic.SMC({ position: { x: defaultX, y: defaultY + 7 * gapY }}),
+    reg: new joint.shapes.logic.Register({ position: { x: defaultXr, y: defaultY + 7 * gapY }}),
     
     
     

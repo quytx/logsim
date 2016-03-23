@@ -43,7 +43,10 @@ var addGate = function(graph, type, xpos, ypos) {
             break;
         case "logic.SMC":
             newGate = new joint.shapes.logic.SMC({ position: { x: xpos, y: ypos}});
-            break;  
+            break;
+        case "logic.Register":
+            newGate = new joint.shapes.logic.Register({ position: { x: xpos, y: ypos}});
+            break;      
         // case "logic.rect":
         //     newGate = new joint.shapes.logic.rect({ position: { x: xpos, y: ypos}});
         //     break;                      
@@ -84,10 +87,11 @@ var notify = function(text, type) {
     $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 8000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
 }
 
-var busInputGates = ['logic.Mux21_16', 'logic.Splitter', 'logic.SMC'];
-var busOutputGates = ['logic.Mux21_16', 'logic.Joiner', 'logic.SMC'];
+var busInputGates = ['logic.Mux21_16', 'logic.Splitter', 'logic.SMC', 'logic.Register'];
+var busOutputGates = ['logic.Mux21_16', 'logic.Joiner', 'logic.SMC', 'logic.Register'];
 var multiInputGates = ['logic.Joiner'];
 var multiOutputValue = ['logic.SMC'];
+var mixInputTypes = ['logic.Register'];
 
 var hasBusInput = function(cell) {
     return _.indexOf(busInputGates, cell.attributes.type) > -1;
@@ -103,6 +107,10 @@ var hasMultiInput = function(cell) {
 
 var hasMultiOutputValues = function(cell) {
     return _.indexOf(multiOutputValue, cell.attributes.type) > -1;
+}
+
+var hasMixInput = function(cell) {
+    return _.indexOf(mixInputTypes, cell.attributes.type) > -1;
 }
 
 var setLabel = function(link, label, index, optionalPos) {

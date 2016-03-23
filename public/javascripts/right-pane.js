@@ -31,10 +31,13 @@ var rpaper = new joint.dia.Paper({
 
         if (e === 'target') {
             
-             if (hasBusOutput(vs.model) != hasBusInput(vt.model)) return false;   // validate bus connection
+            if (hasBusOutput(vs.model) != hasBusInput(vt.model) && !hasMixInput(vt.model)) return false;   // validate bus connection
 
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
+
+            // Register WE
+            // if (vt.model.attributes.type === 'logic.Register' && )
 
             // Handle multiple output values: Set source ID if source has multiple output values
             if (hasMultiOutputValues(vs.model)) {
@@ -383,9 +386,6 @@ rgraph.on('change', function(cell) {
     if (cell.get('sjId') !== undefined && cell.attributes.labels === undefined) {
         var splitter = rgraph.getCell(cell.get('sjId')[0]);
         var joiner = rgraph.getCell(cell.get('sjId')[1]);
-        // var lbl = '';
-        // lbl = lbl.concat(rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1).concat(' : ').concat(rgraph.getConnectedLinks(joiner, { inbound: true }).length);
-        // setLabel(cell, lbl, 0);
         setLabel(cell, rgraph.getConnectedLinks(splitter, { outbound: true }).length - 1, 0, LBL_LEFT_POS);
         setLabel(cell, rgraph.getConnectedLinks(joiner, { inbound: true }).length, 1, LBL_RIGHT_POS);
     }
