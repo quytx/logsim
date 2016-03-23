@@ -87,6 +87,11 @@ var notify = function(text, type) {
     $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 8000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
 }
 
+var SPLITTER = 'logic.Splitter';
+var JOINER = 'logic.Joiner';
+var SMC = 'logic.SMC';
+var REG = 'logic.Register';
+
 var busInputGates = ['logic.Mux21_16', 'logic.Splitter', 'logic.SMC', 'logic.Register'];
 var busOutputGates = ['logic.Mux21_16', 'logic.Joiner', 'logic.SMC', 'logic.Register'];
 var multiInputGates = ['logic.Joiner'];
@@ -118,6 +123,15 @@ var setLabel = function(link, label, index, optionalPos) {
     link.label(index, { position: pos, attrs: { text: { text: label, fill: 'white', 'font-family': 'sans-serif' }, rect: { fill: 'black', stroke: 'black', 'stroke-width': 8, rx: 0, ry: 0 } }});
 }
 
+var hasNoLabel = function(cell, pos) {
+    return cell.attributes.labels === undefined || _.findWhere(cell.attributes.labels, {position: pos}) === undefined;
+}
+
+var nextLabelIndex = function(cell, pos) {
+    if (cell.attributes.labels === undefined) return 0;
+    var i = _.findIndex(cell.attributes.labels, { position: pos});
+    return (i === -1) ? cell.attributes.labels.length : i;
+}
 
 // Helper Function to label SMC output wires
 //var labelSMC = function(smcCell) 
