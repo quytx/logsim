@@ -188,8 +188,12 @@ function saveGraph(btn) {
 }
 
 function loadGraph() {
-    if (graphJSON === undefined) return;
+    if (graphJSON === undefined) { 
+        alert("Please select a file first!");
+        return; 
+    }
     rgraph.fromJSON(graphJSON);
+    notify("Successfully loaded!", 'success');
 }
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
