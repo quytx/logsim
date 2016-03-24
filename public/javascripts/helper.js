@@ -46,36 +46,38 @@ var addGate = function(graph, type, xpos, ypos) {
             break;
         case "logic.Register":
             newGate = new joint.shapes.logic.Register({ position: { x: xpos, y: ypos}});
+            // newGate.outQ = undefined;
+            // newGate.clk = 0;
+            // newGate.reset = function() {
+            //     newGate.outQ = undefined;
+            //     newGate.clk = 0;
+            // }
+            // newGate.nextTimeStep = function() {
+            //     var dIn,we;
+            //     rgraph.getConnectedLinks(newGate, {inbound: true}).forEach(function(link) {
+            //         if (link.attributes.target.port === newGate.dIn) dIn = link;
+            //         else if (link.attributes.target.port === newGate.we) we = link;
+            //     });
+            //     if (dIn === undefined || we === undefined) return;
+            //     if (newGate.clk === 0) {
+            //         if (we.get('signal') === 1) {
+            //             newGate.outQ = dIn.get('busSignal');
+            //         }
+            //     } else {
+            //         newGate.clk = 0;
+            //     }
+            // }
+
+            // newGate.operation = function() {
+            //     return newGate.outQ;
+            // }
+
             break;      
         // case "logic.rect":
         //     newGate = new joint.shapes.logic.rect({ position: { x: xpos, y: ypos}});
         //     break;                      
         case "logic.Dff":
             newGate = new joint.shapes.logic.Dff({ position: { x: xpos, y: ypos}});
-            newGate.outQ = undefined;
-            newGate.clk = 0;
-            newGate.reset = function() {
-                newGate.outQ = undefined;
-                newGate.clk = 0;
-            }
-            newGate.nextTimeStep = function() {
-                var wireIn = rgraph.getConnectedLinks(newGate, { inbound: true });
-                if (wireIn.length > 0) {
-                    var inD = wireIn[0].get('signal'); // current input signal
-                    if (newGate.clk === 0) {
-                        newGate.clk = 1;
-                        newGate.outQ = (inD === 1) ? true : false;
-                    } else {
-                        newGate.clk = 0;
-                    }
-                }
-                
-                // console.log(newGate);
-            }
-            newGate.operation = function(input) {
-                return newGate.outQ;
-            }
-
             break;           
         default:
             break;
