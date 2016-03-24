@@ -50,6 +50,7 @@ var lgates = {
     splitter: new joint.shapes.logic.Splitter({ position: { x: defaultXr, y: defaultY + 6 * gapY }}),
     smc: new joint.shapes.logic.SMC({ position: { x: defaultX, y: defaultY + 7 * gapY }}),
     reg: new joint.shapes.logic.Register({ position: { x: defaultXr, y: defaultY + 7 * gapY }}),
+    alu: new joint.shapes.logic.ALU({ position: { x: defaultX, y: defaultY + 8 * gapY }})
     
     
     

@@ -44,6 +44,9 @@ var addGate = function(graph, type, xpos, ypos) {
         case "logic.SMC":
             newGate = new joint.shapes.logic.SMC({ position: { x: xpos, y: ypos}});
             break;
+        case "logic.ALU":
+            newGate = new joint.shapes.logic.ALU({ position: { x: xpos, y: ypos}});
+            break;    
         case "logic.Register":
             newGate = new joint.shapes.logic.Register({ position: { x: xpos, y: ypos}});
             break;                       
@@ -66,6 +69,7 @@ var SPLITTER = 'logic.Splitter';
 var JOINER = 'logic.Joiner';
 var SMC = 'logic.SMC';
 var REG = 'logic.Register';
+var ALU = 'logic.ALU';
 
 var busInputGates = ['logic.Mux21_16', 'logic.Splitter', 'logic.SMC', 'logic.Register'];
 var busOutputGates = ['logic.Mux21_16', 'logic.Joiner', 'logic.SMC', 'logic.Register'];

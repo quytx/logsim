@@ -237,3 +237,41 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
     }
 });
+
+
+joint.shapes.logic.ALU = joint.shapes.basic.Generic.extend({
+    markup: '<g class="rotatable"><g class="scalable"><rect class="alu"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="input3"/><circle class="input4"/><circle class="output1"/><circle class="output2"/></g>',
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.ALU',
+        attrs: {
+            rect: { fill: 'white', rx: 2, ry: 2, stroke: 'black', 'stroke-width': 1.5, 'follow-scale': true, width: 80, height: 40 },
+            text: {
+                text: 'ALU', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
+            },
+            '.alu': { width: 100, height: 50 },
+            circle: { r: 6, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            '.input1': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.2, magnet: 'passive', port: 'in1' },  // 
+            '.input2': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.4, magnet: 'passive', port: 'in2' },  // 
+            '.input3': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.6, magnet: 'passive', port: 'in3' },  // 
+            '.input4': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.8, magnet: 'passive', port: 'in4' },  // 
+            '.output1': { ref: '.alu', 'ref-dx': 0, 'ref-y': 0.3, magnet: true, port: 'out1' },
+            '.output2': { ref: '.alu', 'ref-dx': 0, 'ref-y': 0.7, magnet: true, port: 'out2' }
+        }
+
+    }, joint.shapes.logic.Gate.prototype.defaults),
+
+    a_in: 'in1',
+    b_in: 'in2',
+    sreg_in: 'in3',
+    op: 'in4',
+    q_out: 'out1',
+    sreg_out: 'out2',
+
+    initialize: function() {
+        // Resize
+        this.set({ size: { width: 80, height: 100 } } );
+        joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
+    }
+});
