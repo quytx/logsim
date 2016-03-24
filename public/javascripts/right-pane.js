@@ -168,22 +168,15 @@ function broadcastSplitter(gate) {
 
 
 function incrDff(graph) {
-    _.each(rgraph.getElements(), function(element) {
+    _.each(graph.getElements(), function(element) {
         (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.nextTimeStep.call(element, graph);
     });
-    _.each(rgraph.getElements(), function(element) {
+    _.each(graph.getElements(), function(element) {
         (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.nextTimeStep.call(element, graph);
     });
     timeStep++;
 }
 
-// function initializeBusSignal() {
-//     if (!simulateOn) { return; }
-//     _.each(rgraph.getElements(), function(element) {
-//         // broadcast a new signal from every joiner in the rgraph
-//         (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, signal);
-//     });
-// }
 
 function initializeSignal() {
     
