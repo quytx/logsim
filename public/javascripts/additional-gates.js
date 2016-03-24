@@ -1,3 +1,17 @@
+joint.shapes.logic.InputLow = joint.shapes.logic.IO.extend({
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.InputLow',
+        attrs: {
+            '.wire': { 'ref-dx': 0, d: 'M 0 0 L 23 0' },
+            circle: { ref: '.body', 'ref-dx': 30, 'ref-y': 0.5, magnet: true, 'class': 'output', port: 'out' },
+            text: { text: 'low' }
+        }
+
+    }, joint.shapes.logic.IO.prototype.defaults)
+});
+
 joint.shapes.logic.Gate31 = joint.shapes.logic.Gate.extend({
 
     markup: '<g class="rotatable"><g class="scalable"><image class="body"/></g><circle class="input input1"/><circle  class="input input2"/><circle  class="input input3"/><circle class="output"/></g>',
@@ -271,7 +285,7 @@ joint.shapes.logic.ALU = joint.shapes.basic.Generic.extend({
 
     initialize: function() {
         // Resize
-        this.set({ size: { width: 80, height: 100 } } );
+        this.set({ size: { width: 80, height: 90 } } );
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
     }
 });

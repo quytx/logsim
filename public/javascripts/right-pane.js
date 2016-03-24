@@ -205,7 +205,8 @@ function initializeSignal() {
     // Otherwise broadcast signals
     _.each(rgraph.getElements(), function(element) {
         // broadcast a new signal from every input in the rgraph
-        (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, signal);
+        (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, 1);
+        (element instanceof joint.shapes.logic.InputLow) && broadcastSignal(element, -1);
     });
 
     return signal;

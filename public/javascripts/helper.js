@@ -5,6 +5,9 @@ var addGate = function(graph, type, xpos, ypos) {
         case "logic.Input":
             newGate = new joint.shapes.logic.Input({ position: { x: xpos, y: ypos}});
             break;
+        case "logic.InputLow":
+            newGate = new joint.shapes.logic.InputLow({ position: { x: xpos, y: ypos}});
+            break;    
         case "logic.Output":
             newGate = new joint.shapes.logic.Output({ position: { x: xpos, y: ypos}});
             break;
