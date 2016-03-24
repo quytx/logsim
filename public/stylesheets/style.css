@@ -15,20 +15,18 @@ body {
 
 #left-col {
     border: solid 1px black;
-    height: 100%;
+    height: 96%;
     width: 20%;
     float: left;
+    overflow: scroll;
 }
 
 #right-col {
     margin-left: 20%;
     width: 80%;
-    border: solid 1px black;
-}
-
-#paper {
-    border: solid 1px black;
+    height: 96%;
     overflow: scroll;
+    border: solid 1px black;
 }
 
 a {

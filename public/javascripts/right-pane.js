@@ -3,8 +3,8 @@ var simulateOn = false;
 var timeStep = 0;
 // Graph option
 var scale = { x: 0.8, y: 0.8, rate: 1.1 };
-var width = 1260;
-var height = 900;
+var width = 2560;
+var height = 1600;
 var gridSize = 6;
 var gridColor = 'lightgrey';
 var LBL_LEFT_POS = 0.2;
@@ -16,7 +16,7 @@ var rgraph = new joint.dia.Graph();
 
 var rpaper = new joint.dia.Paper({
 
-    el: $('#paper'),
+    el: $('#right-col'),
     model: rgraph,
     width: width, height: height, gridSize: gridSize,
     snapLinks: false,
@@ -75,21 +75,21 @@ setGrid(rpaper, gridSize, gridColor);
 // scale
 rpaper.scale(scale.x, scale.y);
 
-rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
-    var bbox = cellView.getBBox();
-    var constrained = false;
-    var constrainedX = x;
-    if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
-    if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
-    var constrainedY = y;
-    if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
-    if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
-    if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
-});
+// rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
+//     var bbox = cellView.getBBox();
+//     var constrained = false;
+//     var constrainedX = x;
+//     if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
+//     if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
+//     var constrainedY = y;
+//     if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
+//     if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
+//     if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
+// });
 
 // Resize paper to fit outter div
-var mainDiv = document.getElementById('right-col');
-rpaper.setDimensions(mainDiv.offsetWidth, mainDiv.offsetHeight);
+// var mainDiv = document.getElementById('right-col');
+// rpaper.setDimensions(mainDiv.offsetWidth, mainDiv.offsetHeight);
 // console.log(mainDiv.offsetWidth, mainDiv.offsetHeight);
 
 // Zoom in 
