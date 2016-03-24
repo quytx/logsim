@@ -444,10 +444,9 @@ $("#simBtn").click(function() {
     $("#simBtn").css('visibility', 'hidden');
     $("#resetBtn").css('visibility', 'visible');
 
-    var sequentialLogic = false;
-    _.each(rgraph.getElements(), function(element) {
-        if (element instanceof joint.shapes.logic.Dff)
-            sequentialLogic = true;
+    var sequentialLogic = _.some(rgraph.getElements(), function(element) {
+        return (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register)
+               && rgraph.getConnectedLinks(element, {inbound : true}).length > 0;
     });
 
     if (sequentialLogic) {
