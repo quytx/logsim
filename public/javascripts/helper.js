@@ -46,36 +46,7 @@ var addGate = function(graph, type, xpos, ypos) {
             break;
         case "logic.Register":
             newGate = new joint.shapes.logic.Register({ position: { x: xpos, y: ypos}});
-            // newGate.outQ = undefined;
-            // newGate.clk = 0;
-            // newGate.reset = function() {
-            //     newGate.outQ = undefined;
-            //     newGate.clk = 0;
-            // }
-            // newGate.nextTimeStep = function() {
-            //     var dIn,we;
-            //     rgraph.getConnectedLinks(newGate, {inbound: true}).forEach(function(link) {
-            //         if (link.attributes.target.port === newGate.dIn) dIn = link;
-            //         else if (link.attributes.target.port === newGate.we) we = link;
-            //     });
-            //     if (dIn === undefined || we === undefined) return;
-            //     if (newGate.clk === 0) {
-            //         if (we.get('signal') === 1) {
-            //             newGate.outQ = dIn.get('busSignal');
-            //         }
-            //     } else {
-            //         newGate.clk = 0;
-            //     }
-            // }
-
-            // newGate.operation = function() {
-            //     return newGate.outQ;
-            // }
-
-            break;      
-        // case "logic.rect":
-        //     newGate = new joint.shapes.logic.rect({ position: { x: xpos, y: ypos}});
-        //     break;                      
+            break;                       
         case "logic.Dff":
             newGate = new joint.shapes.logic.Dff({ position: { x: xpos, y: ypos}});
             break;           
@@ -137,11 +108,7 @@ var nextLabelIndex = function(cell, pos) {
     return (i === -1) ? cell.attributes.labels.length : i;
 }
 
-// Helper Function to label SMC output wires
-//var labelSMC = function(smcCell) 
-
-// Source: http://stackoverflow.com/questions/34577581/how-to-enable-draw-grid-lines-for-jointjs-graph
-function setGrid(paper, gridSize, color) {
+function setGrid(paper, gridSize, color) {  
     // Set grid size on the JointJS paper object (joint.dia.Paper instance)
     paper.options.gridSize = gridSize;
     // Draw a grid into the HTML 5 canvas and convert it to a data URI image
@@ -156,7 +123,7 @@ function setGrid(paper, gridSize, color) {
     // Finally, set the grid background image of the paper container element.
     var gridBackgroundImage = canvas[0].toDataURL('image/png');
     paper.$el.css('background-image', 'url("' + gridBackgroundImage + '")');
-}
+}   // Source: http://stackoverflow.com/questions/34577581/how-to-enable-draw-grid-lines-for-jointjs-graph
 
 function setError(gate, text) {
     gate.set('errMsg', text);
