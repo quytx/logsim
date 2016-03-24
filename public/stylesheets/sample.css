@@ -115,6 +115,20 @@
     transition: all 0.2s;
 }
 
+.element .rf {
+    fill: #EEE;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.element .ram {
+    fill: #EEE;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
 .element .alu {
     fill: #AD8;
     stroke: #000;

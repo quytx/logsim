@@ -209,7 +209,7 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
                 text: 'REG', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
             },
             '.reg': { width: 100, height: 50 },
-            circle: { r: 6, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
             '.input1': { ref: '.reg', 'ref-x': 0, 'ref-y': 0.3, magnet: 'passive', port: 'in1' },  // for d-in
             '.input2': { ref: '.reg', 'ref-x': 0, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for write-enable
             '.output': { ref: '.reg', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
@@ -248,6 +248,8 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
         self.operation = function() {
             return self.outQ;
         }
+        // Resize
+        this.set({ size: { width: 80, height: 50 } } );
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
     }
 });
@@ -265,7 +267,7 @@ joint.shapes.logic.ALU = joint.shapes.basic.Generic.extend({
                 text: 'ALU', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
             },
             '.alu': { width: 100, height: 50 },
-            circle: { r: 6, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
             '.input1': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.2, magnet: 'passive', port: 'in1' },  // 
             '.input2': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.4, magnet: 'passive', port: 'in2' },  // 
             '.input3': { ref: '.alu', 'ref-x': 0, 'ref-y': 0.6, magnet: 'passive', port: 'in3' },  // 
@@ -285,7 +287,110 @@ joint.shapes.logic.ALU = joint.shapes.basic.Generic.extend({
 
     initialize: function() {
         // Resize
-        this.set({ size: { width: 80, height: 90 } } );
+        this.set({ size: { width: 80, height: 120 } } );
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
     }
 });
+
+// PM: 1 in 1 out
+joint.shapes.logic.PM = joint.shapes.basic.Generic.extend({
+    markup: '<g class="rotatable"><g class="scalable"><rect class="pm"/></g><text/><circle class="input"/><circle class="output"/></g>',
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.PM',
+        attrs: {
+            rect: { fill: 'white', rx: 2, ry: 2, stroke: 'black', 'stroke-width': 1.5, 'follow-scale': true, width: 80, height: 40 },
+            text: {
+                text: 'PM', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
+            },
+            '.pm': { width: 100, height: 50 },
+            circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            '.input': { ref: '.pm', 'ref-x': 0, 'ref-y': 0.5, magnet: 'passive', port: 'in' },  // 
+            '.output': { ref: '.pm', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
+        }
+
+    }, joint.shapes.logic.Gate.prototype.defaults),
+
+    addr: 'in',
+    dout: 'out',
+
+    initialize: function() {
+        // Resize
+        // this.set({ size: { width: 80, height: 90 } } );
+        joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
+    }
+});
+
+
+// RF: 3 in 2 out
+joint.shapes.logic.RF = joint.shapes.basic.Generic.extend({
+    markup: '<g class="rotatable"><g class="scalable"><rect class="rf"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="input3"/><circle class="output1"/><circle class="output2"/></g>',
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.RF',
+        attrs: {
+            rect: { fill: 'white', rx: 2, ry: 2, stroke: 'black', 'stroke-width': 1.5, 'follow-scale': true, width: 80, height: 40 },
+            text: {
+                text: 'RF', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
+            },
+            '.rf': { width: 100, height: 50 },
+            circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            '.input1': { ref: '.rf', 'ref-x': 0, 'ref-y': 0.25, magnet: 'passive', port: 'in1' },  // 
+            '.input2': { ref: '.rf', 'ref-x': 0, 'ref-y': 0.5, magnet: 'passive', port: 'in2' },  // 
+            '.input3': { ref: '.rf', 'ref-x': 0, 'ref-y': 0.75, magnet: 'passive', port: 'in3' },  // 
+            '.output1': { ref: '.rf', 'ref-dx': 0, 'ref-y': 0.3, magnet: true, port: 'out1' },
+            '.output2': { ref: '.rf', 'ref-dx': 0, 'ref-y': 0.7, magnet: true, port: 'out2' }
+        }
+
+    }, joint.shapes.logic.Gate.prototype.defaults),
+
+    addr: 'in1',
+    din: 'in2',
+    we: 'in3',
+    dout: 'out1',
+    x: 'out2',
+
+    initialize: function() {
+        // Resize
+        this.set({ size: { width: 80, height: 80 } } );
+        joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
+    }
+});
+
+// RAM: 3 in 1 out
+joint.shapes.logic.RAM = joint.shapes.basic.Generic.extend({
+    markup: '<g class="rotatable"><g class="scalable"><rect class="ram"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="input3"/><circle class="output"/></g>',
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.RAM',
+        attrs: {
+            rect: { fill: 'white', rx: 2, ry: 2, stroke: 'black', 'stroke-width': 1.5, 'follow-scale': true, width: 80, height: 40 },
+            text: {
+                text: 'RAM', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
+            },
+            '.ram': { width: 100, height: 50 },
+            circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            '.input1': { ref: '.ram', 'ref-x': 0, 'ref-y': 0.25, magnet: 'passive', port: 'in1' },  // 
+            '.input2': { ref: '.ram', 'ref-x': 0, 'ref-y': 0.5, magnet: 'passive', port: 'in2' },  // 
+            '.input3': { ref: '.ram', 'ref-x': 0, 'ref-y': 0.75, magnet: 'passive', port: 'in3' },  // 
+            '.output': { ref: '.ram', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
+        }
+
+    }, joint.shapes.logic.Gate.prototype.defaults),
+
+    addr: 'in1',
+    din: 'in2',
+    we: 'in3',
+    dout: 'out',
+
+    initialize: function() {
+        // Resize
+        this.set({ size: { width: 80, height: 80 } } );
+        joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
+    }
+});
+
+

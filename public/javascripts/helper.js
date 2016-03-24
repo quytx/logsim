@@ -47,6 +47,15 @@ var addGate = function(graph, type, xpos, ypos) {
         case "logic.SMC":
             newGate = new joint.shapes.logic.SMC({ position: { x: xpos, y: ypos}});
             break;
+        case "logic.PM":
+            newGate = new joint.shapes.logic.PM({ position: { x: xpos, y: ypos}});
+            break;
+        case "logic.RF":
+            newGate = new joint.shapes.logic.RF({ position: { x: xpos, y: ypos}});
+            break;
+        case "logic.RAM":
+            newGate = new joint.shapes.logic.RAM({ position: { x: xpos, y: ypos}});
+            break;    
         case "logic.ALU":
             newGate = new joint.shapes.logic.ALU({ position: { x: xpos, y: ypos}});
             break;    
@@ -85,17 +94,24 @@ var notify = function(text, type) {
 
 var WIRE = 'logic.Wire';
 var BUS = 'logic.Bus';
+var MUX16 = 'logic.Mux21_16';
 var SPLITTER = 'logic.Splitter';
 var JOINER = 'logic.Joiner';
 var SMC = 'logic.SMC';
 var REG = 'logic.Register';
 var ALU = 'logic.ALU';
+var PM = 'logic.PM';
+var RF = 'logic.RF';
+var RAM = 'logic.RAM';
 
-var busInputGates = ['logic.Mux21_16', 'logic.Splitter', 'logic.SMC', 'logic.Register'];
-var busOutputGates = ['logic.Mux21_16', 'logic.Joiner', 'logic.SMC', 'logic.Register'];
-var multiInputGates = ['logic.Joiner'];
-var multiOutputValue = ['logic.SMC'];
-var mixInputTypes = ['logic.Register'];
+
+
+var busInputGates = [ MUX16, SPLITTER, SMC, REG, PM, RF, ALU ];
+var busOutputGates = [ MUX16, JOINER, SMC, REG, PM, RF, ALU ];
+var multiInputGates = [ JOINER ];
+var multiOutputValue = [ SMC, ALU, RF ];
+var mixInputTypes = [ REG, RF, ALU, RAM ];
+
 
 var hasBusInput = function(cell) {
     return _.indexOf(busInputGates, cell.attributes.type) > -1;
