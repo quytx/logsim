@@ -108,7 +108,7 @@ $('#zoomOutBtn').click(function() {
 
 function resetFlipFlops() {
     _.each(rgraph.getElements(), function(element) {
-        (element instanceof joint.shapes.logic.Dff) && element.reset.apply();
+        (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.reset.apply();
     });
 }
 
@@ -166,12 +166,13 @@ function broadcastSplitter(gate) {
     } 
 }
 
-function incrDff() {
+
+function incrDff(graph) {
     _.each(rgraph.getElements(), function(element) {
-        (element instanceof joint.shapes.logic.Dff) && element.nextTimeStep.apply();
+        (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.nextTimeStep.call(element, graph);
     });
     _.each(rgraph.getElements(), function(element) {
-        (element instanceof joint.shapes.logic.Dff) && element.nextTimeStep.apply();
+        (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.nextTimeStep.call(element, graph);
     });
     timeStep++;
 }
@@ -273,7 +274,11 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
 
 
         
-        } else {
+        } else if (gate instanceof joint.shapes.logic.Register) {
+            // broadcast
+            broadcastBus(gate, gate.operation.apply(gate));
+        } 
+        else {
             // multi-bus input with 1 output handle here, e.g. Mux 16
             // Get all input buses
             var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
@@ -348,7 +353,12 @@ rgraph.on('change:signal', function(wire, signal) {
             })
             .value();
             broadcastBus(gate, busIn);
-        } else {
+        } else if (gate instanceof joint.shapes.logic.Register) {
+            // broadcast
+            broadcastBus(gate, gate.operation.apply(gate));
+        }
+
+        else {
             gate.onSignal(signal, function() {
                 // get an array of signals on all input ports
                 var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
@@ -401,6 +411,7 @@ rgraph.on('change', function(cell) {
         } else if (target !== null && target.attributes.type === REG && hasNoLabel(cell, LBL_RIGHT_POS)) {
             if (cell.attributes.target.port === target.dIn ) setLabel(cell, 'd_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
             if (cell.attributes.target.port === target.we ) setLabel(cell, 'we', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+            // console.log(rgraph.getConnectedLinks(target, {inbound: true}));
         }
     }
 })
@@ -467,7 +478,7 @@ $("#resetBtn").click(function() {
 });
 
 $("#stepForward").click(function() {
-    incrDff();
+    incrDff(rgraph);
     $("#currTimeStep").html(timeStep);
     current = initializeSignal();
 });
