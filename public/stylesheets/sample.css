@@ -94,6 +94,36 @@
     transition: all 0.2s;
 }
 
+.element .reg {
+    fill: #FFDC80;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.element .smc {
+    fill: white;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.element .pm {
+    fill: #EEE;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
+.element .alu {
+    fill: #ADD;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
+
+
 .element circle {
     fill: #fff;
     stroke: #7f8c8d;

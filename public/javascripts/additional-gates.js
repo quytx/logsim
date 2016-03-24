@@ -97,13 +97,6 @@ joint.shapes.logic.Mux21_16 = joint.shapes.logic.Gate31.extend({
 
 });
 
-//////////////////
-
-
-
-///////////////
-
-
 // Bus connection
 joint.shapes.logic.Bus = joint.dia.Link.extend({
 
@@ -162,19 +155,9 @@ joint.shapes.logic.Splitter = joint.shapes.logic.Gate11.extend({
 });
 
 
-// joint.shapes.logic.SMC = joint.shapes.logic.Gate11.extend({
-//     defaults: joint.util.deepSupplement({
-//         type: 'logic.SMC',
-//         attrs: { image: { 'xlink:href': 'data:image/png;base64,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gAU4FKcLMwETMIF0AhbgdFbOaQImYAKhBCzAoThdmAmYgAmkE7AAp7NyThMwARMIJWABDsXpwkzABEwgnYAFOJ2Vc5qACZhAKAELcChOF2YCJmAC6QQswOmsnNMETMAEQglYgENxujATMAETSCdgAU5n5ZwmYAImEErAAhyK04WZgAmYQDoBC3A6K+c0ARMwgVACFuBQnC7MBEzABNIJWIDTWTmnCZiACYQSsACH4nRhJmACJpBOwAKczso5TcAETCCUgAU4FKcLMwETMIF0AhbgdFbOaQImYAKhBCzAoThdmAmYgAmkE7AAp7NyThMwARMIJWABDsXpwkzABEwgnYAFOJ2Vc5qACZhAKAELcChOF2YCJmAC6QQswOmsnNMETMAEQglYgENxujATMAETSCdgAU5n5ZwmYAImEErAAhyK04WZgAmYQDoBC3A6K+c0ARMwgVACFuBQnC7MBEzABNIJWIDTWTmnCZiACYQSsACH4nRhJmACJpBOwAKczso5TcAETCCUgAU4FKcLMwETMIF0AhbgdFbOaQImYAKhBCzAoThdmAmYgAmkE7AAp7NyThMwARMIJWABDsXpwkzABEwgnYAFOJ2Vc5qACZhAKAELcChOF2YCJmAC6QQswOmsnNMETMAEQglYgENxujATMAETSCewU4DfLulp6eU4pwmYgAmYQCaBh035zz1l+suFks7OLMTZTcAETMAEyglYgMvZ+UkTMAETqCJwuQBXleKHTcAETMAE8gn8P+peUqWOcuwoAAAAAElFTkSuQmCC' }}
-//     }, joint.shapes.logic.Gate11.prototype.defaults),
-//     outputsList: function() {
-//         return ['PC_sel', 'PC_we', 'INST_we', 'REG_sel', 'REG_we', 'OFF_we', 'OFF_sel', 'REG2_we', 'RF_sel', 'RF_we', 'VAL1_we', 'VAL2_we', 'VAL2_sel', 'ADDR_we', 'A_sel', 'B_sel', 'ALU_op', 'RAM_we', 'SREG_we', 'VAL_sel', 'VAL_we' ];
-//     }
-// });
-
 // State Machine Controller
 joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
-    markup: '<g class="rotatable"><g class="scalable"><rect class="box"/></g><text/><circle class="input1"/><circle class="output"/></g>',
+    markup: '<g class="rotatable"><g class="scalable"><rect class="smc"/></g><text/><circle class="input1"/><circle class="output"/></g>',
 
     defaults: joint.util.deepSupplement({
 
@@ -184,11 +167,11 @@ joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
             text: {
                 text: 'SMC', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
             },
-            '.box': { width: 100, height: 50 },
+            '.smc': { width: 100, height: 50 },
             circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
-            '.input1': { ref: '.box', 'ref-x': -0, 'ref-y': 0.5, magnet: 'passive', port: 'in1' },  // for state number (5-bit)
-            // '.input2': { ref: '.box', 'ref-x': -2, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for input bus
-            '.output': { ref: '.box', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
+            '.input1': { ref: '.smc', 'ref-x': -0, 'ref-y': 0.5, magnet: 'passive', port: 'in1' },  // for state number (5-bit)
+            // '.input2': { ref: '.smc', 'ref-x': -2, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for input bus
+            '.output': { ref: '.smc', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
         }
 
     }, joint.shapes.logic.Gate.prototype.defaults),
@@ -201,7 +184,7 @@ joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
 
 // Registers
 joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
-    markup: '<g class="rotatable"><g class="scalable"><rect class="box"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="output"/></g>',
+    markup: '<g class="rotatable"><g class="scalable"><rect class="reg"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="output"/></g>',
 
     defaults: joint.util.deepSupplement({
 
@@ -211,11 +194,11 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
             text: {
                 text: 'REG', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
             },
-            '.box': { width: 100, height: 50 },
+            '.reg': { width: 100, height: 50 },
             circle: { r: 6, stroke: 'black', fill: 'white', 'stroke-width': 2 },
-            '.input1': { ref: '.box', 'ref-x': 0, 'ref-y': 0.3, magnet: 'passive', port: 'in1' },  // for d-in
-            '.input2': { ref: '.box', 'ref-x': 0, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for write-enable
-            '.output': { ref: '.box', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
+            '.input1': { ref: '.reg', 'ref-x': 0, 'ref-y': 0.3, magnet: 'passive', port: 'in1' },  // for d-in
+            '.input2': { ref: '.reg', 'ref-x': 0, 'ref-y': 0.7, magnet: 'passive', port: 'in2' },  // for write-enable
+            '.output': { ref: '.reg', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
         }
 
     }, joint.shapes.logic.Gate.prototype.defaults),
