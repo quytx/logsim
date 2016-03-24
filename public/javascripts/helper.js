@@ -62,6 +62,23 @@ var addGate = function(graph, type, xpos, ypos) {
     graph.addCell(newGate);
 }
 
+function setGrid(paper, gridSize, color) {  
+    // Set grid size on the JointJS paper object (joint.dia.Paper instance)
+    paper.options.gridSize = gridSize;
+    // Draw a grid into the HTML 5 canvas and convert it to a data URI image
+    var canvas = $('<canvas/>', { width: gridSize, height: gridSize });
+    canvas[0].width = gridSize;
+    canvas[0].height = gridSize;
+    var context = canvas[0].getContext('2d');
+    context.beginPath();
+    context.rect(1, 1, 1, 1);
+    context.fillStyle = color || '#AAAAAA';
+    context.fill();
+    // Finally, set the grid background image of the paper container element.
+    var gridBackgroundImage = canvas[0].toDataURL('image/png');
+    paper.$el.css('background-image', 'url("' + gridBackgroundImage + '")');
+}   // Source: http://stackoverflow.com/questions/34577581/how-to-enable-draw-grid-lines-for-jointjs-graph
+
 var notify = function(text, type) {
     $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 5000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
 }
@@ -113,31 +130,6 @@ var nextLabelIndex = function(cell, pos) {
     if (cell.attributes.labels === undefined) return 0;
     var i = _.findIndex(cell.attributes.labels, { position: pos});
     return (i === -1) ? cell.attributes.labels.length : i;
-}
-
-function setGrid(paper, gridSize, color) {  
-    // Set grid size on the JointJS paper object (joint.dia.Paper instance)
-    paper.options.gridSize = gridSize;
-    // Draw a grid into the HTML 5 canvas and convert it to a data URI image
-    var canvas = $('<canvas/>', { width: gridSize, height: gridSize });
-    canvas[0].width = gridSize;
-    canvas[0].height = gridSize;
-    var context = canvas[0].getContext('2d');
-    context.beginPath();
-    context.rect(1, 1, 1, 1);
-    context.fillStyle = color || '#AAAAAA';
-    context.fill();
-    // Finally, set the grid background image of the paper container element.
-    var gridBackgroundImage = canvas[0].toDataURL('image/png');
-    paper.$el.css('background-image', 'url("' + gridBackgroundImage + '")');
-}   // Source: http://stackoverflow.com/questions/34577581/how-to-enable-draw-grid-lines-for-jointjs-graph
-
-function setError(gate, text) {
-    gate.set('errMsg', text);
-}
-
-function clearError(gate) {
-    gate.unset('errMsg');
 }
 
 var file,reader,graphJSON;

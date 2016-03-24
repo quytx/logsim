@@ -75,22 +75,17 @@ setGrid(rpaper, gridSize, gridColor);
 // scale
 rpaper.scale(scale.x, scale.y);
 
-// rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
-//     var bbox = cellView.getBBox();
-//     var constrained = false;
-//     var constrainedX = x;
-//     if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
-//     if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
-//     var constrainedY = y;
-//     if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
-//     if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
-//     if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
-// });
-
-// Resize paper to fit outter div
-// var mainDiv = document.getElementById('right-col');
-// rpaper.setDimensions(mainDiv.offsetWidth, mainDiv.offsetHeight);
-// console.log(mainDiv.offsetWidth, mainDiv.offsetHeight);
+rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
+    var bbox = cellView.getBBox();
+    var constrained = false;
+    var constrainedX = x;
+    if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
+    if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
+    var constrainedY = y;
+    if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
+    if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
+    if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
+});
 
 // Zoom in 
 $('#zoomInBtn').click(function() {
