@@ -59,6 +59,7 @@ a#saveBtn {
 
 #stepBtn {
     visibility: hidden;
+    margin-left: 1ex;
 }
 
 #resetBtn {
