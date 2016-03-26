@@ -39,7 +39,9 @@ var rpaper = new joint.dia.Paper({
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
 
-            if (vl.model.attributes.type === BUS && vt.model.attributes.type === REG && mt.getAttribute('port') === vt.model.we) {
+            if (vl.model.attributes.type === BUS && ((vt.model.attributes.type === REG && mt.getAttribute('port') === vt.model.we)
+                || (vt.model.attributes.type === RAM && mt.getAttribute('port') === vt.model.we)
+                )) {
                 notify('Write-enable input must be a single bit', 'warning');
                 return false;
             }
@@ -401,6 +403,12 @@ rgraph.on('change', function(cell) {
             if (cell.attributes.target.port === target.dIn ) setLabel(cell, 'd_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
             if (cell.attributes.target.port === target.we ) setLabel(cell, 'we', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
             // console.log(rgraph.getConnectedLinks(target, {inbound: true}));
+        } else if (target !== null && target.attributes.type === RAM && hasNoLabel(cell, LBL_RIGHT_POS)) {
+            // Set input for RAM
+            if (cell.attributes.target.port === target.addr ) setLabel(cell, 'addr', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+            if (cell.attributes.target.port === target.din ) setLabel(cell, 'din', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+            if (cell.attributes.target.port === target.we ) setLabel(cell, 'we', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+
         }
     }
 })
