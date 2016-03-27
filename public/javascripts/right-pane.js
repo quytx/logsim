@@ -186,8 +186,6 @@ function incrDff(graph) {
 
 function initializeSignal() {
     
-    var signal = 1; // signal is high
-    
     // cancel all signals stores in buses and wires
     _.invoke(_.chain(rgraph.getLinks()).reject(function(link) {
         return !(link instanceof joint.shapes.logic.Wire);
@@ -205,7 +203,7 @@ function initializeSignal() {
     });
 
     // If not in simulation mode, return
-    if (!simulateOn) { return signal; }
+    if (!simulateOn) { return 0; }
 
 
     // Otherwise broadcast signals
@@ -215,7 +213,7 @@ function initializeSignal() {
         (element instanceof joint.shapes.logic.InputLow) && broadcastSignal(element, -1);
     });
 
-    return signal;
+    return 1;
 }
 
 // Every logic gate needs to know how to handle a situation, when a signal comes to their ports.
@@ -339,7 +337,7 @@ rgraph.on('change:signal', function(wire, signal) {
     // if a new signal has been generated stop transmitting the old one
     if (magnitude !== current) return;
 
-    var gate = rgraph.getCell(wire.get('target').id);
+    var gate = rgraph.getCell(wire.get('target').id);   // target
 
     if (gate) {
         if (gate instanceof joint.shapes.logic.Joiner) {
@@ -358,6 +356,8 @@ rgraph.on('change:signal', function(wire, signal) {
             broadcastBus(gate, gate.operation.apply(gate));
         }
 
+
+        // For other combinational-logic gates like and, or, xor, etc.
         else {
             gate.onSignal(signal, function() {
                 // get an array of signals on all input ports
@@ -388,7 +388,6 @@ rgraph.on('change', function(cell) {
         var source = cell.getSourceElement();
         var target = cell.getTargetElement();
         if (target !== null && target.attributes.type === JOINER && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            // Find target
             setLabel(cell, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
         } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(cell, LBL_LEFT_POS)) {
             setLabel(cell, rgraph.getConnectedLinks(source, { outbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_LEFT_POS);
@@ -433,6 +432,7 @@ rgraph.on('change', function(cell) {
 })
 
 
+// Re-label spliiter and joiner when a link is removed
 rgraph.on('remove', function(cell) {
     if (cell.isLink()) {
         var source = rgraph.getCell(cell.get('sourceId'));
