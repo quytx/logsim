@@ -1,73 +1,45 @@
 // Add a new gate to the graph when a certain type of gate is clicked
+
+$(function() {
+    window.views = {
+        'logic.Input':      joint.shapes.logic.Input,
+        'logic.InputLow':   joint.shapes.logic.InputLow,
+        'logic.Output':     joint.shapes.logic.Output,
+        'logic.And':        joint.shapes.logic.And,
+        'logic.Or':         joint.shapes.logic.Or,
+        'logic.Not':        joint.shapes.logic.Not,
+        'logic.Nand':       joint.shapes.logic.Nand,
+        'logic.Nor':        joint.shapes.logic.Nor,
+        'logic.Xor':        joint.shapes.logic.Xor,
+        'logic.Xnor':       joint.shapes.logic.Xnor,
+        'logic.Mux21':      joint.shapes.logic.Mux21,
+        'logic.Mux21_16':   joint.shapes.logic.Mux21_16,
+        'logic.Splitter':   joint.shapes.logic.Splitter,
+        'logic.Joiner':     joint.shapes.logic.Joiner,
+        'logic.SMC':        joint.shapes.logic.SMC,
+        'logic.PM':         joint.shapes.logic.PM,
+        'logic.RF':         joint.shapes.logic.RF,
+        'logic.RAM':        joint.shapes.logic.RAM,
+        'logic.ALU':        joint.shapes.logic.ALU,
+        'logic.Register':   joint.shapes.logic.Register,
+        'logic.Dff':        joint.shapes.logic.Dff
+    };
+});
+
+var WIRE = 'logic.Wire';
+var BUS = 'logic.Bus';
+var MUX16 = 'logic.Mux21_16';
+var SPLITTER = 'logic.Splitter';
+var JOINER = 'logic.Joiner';
+var SMC = 'logic.SMC';
+var REG = 'logic.Register';
+var ALU = 'logic.ALU';
+var PM = 'logic.PM';
+var RF = 'logic.RF';
+var RAM = 'logic.RAM';
+
 var addGate = function(graph, type, xpos, ypos) {
-    var newGate;
-    switch(type) {
-        case "logic.Input":
-            newGate = new joint.shapes.logic.Input({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.InputLow":
-            newGate = new joint.shapes.logic.InputLow({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Output":
-            newGate = new joint.shapes.logic.Output({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.And":
-            newGate = new joint.shapes.logic.And({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Or":
-            newGate = new joint.shapes.logic.Or({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Not":
-            newGate = new joint.shapes.logic.Not({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Nand":
-            newGate = new joint.shapes.logic.Nand({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Nor":
-            newGate = new joint.shapes.logic.Nor({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Xor":
-            newGate = new joint.shapes.logic.Xor({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Xnor":
-            newGate = new joint.shapes.logic.Xnor({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.Mux21":
-            newGate = new joint.shapes.logic.Mux21({ position: { x: xpos, y: ypos}});
-            break;  
-        case "logic.Mux21_16":
-            newGate = new joint.shapes.logic.Mux21_16({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.Splitter":
-            newGate = new joint.shapes.logic.Splitter({ position: { x: xpos, y: ypos}});
-            break;  
-        case "logic.Joiner":
-            newGate = new joint.shapes.logic.Joiner({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.SMC":
-            newGate = new joint.shapes.logic.SMC({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.PM":
-            newGate = new joint.shapes.logic.PM({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.RF":
-            newGate = new joint.shapes.logic.RF({ position: { x: xpos, y: ypos}});
-            break;
-        case "logic.RAM":
-            newGate = new joint.shapes.logic.RAM({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.ALU":
-            newGate = new joint.shapes.logic.ALU({ position: { x: xpos, y: ypos}});
-            break;    
-        case "logic.Register":
-            newGate = new joint.shapes.logic.Register({ position: { x: xpos, y: ypos}});
-            break;                       
-        case "logic.Dff":
-            newGate = new joint.shapes.logic.Dff({ position: { x: xpos, y: ypos}});
-            break;           
-        default:
-            break;
-    }
+    var newGate = new window.views[type]({ position: { x: xpos, y: ypos}});
     graph.addCell(newGate);
 }
 
@@ -91,19 +63,6 @@ function setGrid(paper, gridSize, color) {
 var notify = function(text, type) {
     $.notify(text, {globalPosition: 'top right', className: type || 'error', autoHide: true, autoHideDelay: 5000, showAnimation: 'fadeIn', hideAnimation: 'fadeOut'});
 }
-
-var WIRE = 'logic.Wire';
-var BUS = 'logic.Bus';
-var MUX16 = 'logic.Mux21_16';
-var SPLITTER = 'logic.Splitter';
-var JOINER = 'logic.Joiner';
-var SMC = 'logic.SMC';
-var REG = 'logic.Register';
-var ALU = 'logic.ALU';
-var PM = 'logic.PM';
-var RF = 'logic.RF';
-var RAM = 'logic.RAM';
-
 
 
 var busInputGates = [ MUX16, SPLITTER, SMC, REG, PM, RF, ALU ];
