@@ -47,8 +47,10 @@ var rpaper = new joint.dia.Paper({
                 port = joint.shapes.logic.Register.prototype.portList[mt.getAttribute('port')];
             } else if (vt.model.attributes.type === RF) {
                 port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
-            }  else if (vt.model.attributes.type === PM) {
-                port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
+            } else if (vt.model.attributes.type === PM) {
+                port = joint.shapes.logic.PM.prototype.portList[mt.getAttribute('port')];
+            } else if (vt.model.attributes.type === ALU) {
+                port = joint.shapes.logic.ALU.prototype.portList[mt.getAttribute('port')];
             }
 
             if (port !== undefined && !verifyPortType(vl, port)) return false;
@@ -422,6 +424,10 @@ rgraph.on('change', function(cell) {
             setLabel(cell, joint.shapes.logic.PM.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
         } else if (source !== null && source.attributes.type === PM && hasNoLabel(cell, LBL_LEFT_POS)) {
             setLabel(cell, joint.shapes.logic.PM.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
+        } else if (target !== null && target.attributes.type === ALU && hasNoLabel(cell, LBL_RIGHT_POS)) {
+            setLabel(cell, joint.shapes.logic.ALU.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (source !== null && source.attributes.type === ALU && hasNoLabel(cell, LBL_LEFT_POS)) {
+            setLabel(cell, joint.shapes.logic.ALU.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
         }
     }
 })

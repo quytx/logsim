@@ -281,12 +281,14 @@ joint.shapes.logic.ALU = joint.shapes.basic.Generic.extend({
 
     }, joint.shapes.logic.Gate.prototype.defaults),
 
-    a_in: 'in1',
-    b_in: 'in2',
-    sreg_in: 'in3',
-    op: 'in4',
-    q_out: 'out1',
-    sreg_out: 'out2',
+    portList: {
+        'in1': { label: 'A', type: 'logic.Bus'},
+        'in2': { label: 'B', type: 'logic.Bus'},
+        'in3': { label: 'sreg_in', type: 'logic.Bus'},
+        'in4': { label: 'op', type: 'logic.Wire'},
+        'out1': { label: 'Q', type: 'logic.Bus'},
+        'out2': { label: 'sreg_out', type: 'logic.Bus'}
+    },
 
     initialize: function() {
         // Resize
