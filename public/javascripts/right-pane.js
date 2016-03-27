@@ -39,37 +39,19 @@ var rpaper = new joint.dia.Paper({
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
 
+            var port;
+
             if (vt.model.attributes.type === RAM) {
-                var port = joint.shapes.logic.RAM.prototype.portList[mt.getAttribute('port')];
-                if (vl.model.attributes.type !== port.type) {
-                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
-                    return false;
-                }
-            }   
-
-            if (vt.model.attributes.type === REG) {
-                var port = joint.shapes.logic.Register.prototype.portList[mt.getAttribute('port')];
-                if (vl.model.attributes.type !== port.type) {
-                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
-                    return false;
-                }
-            }  
-
-            if (vt.model.attributes.type === RF) {
-                var port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
-                if (vl.model.attributes.type !== port.type) {
-                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
-                    return false;
-                }
-            }  
-
-            if (vt.model.attributes.type === PM) {
-                var port = joint.shapes.logic.PM.prototype.portList[mt.getAttribute('port')];
-                if (vl.model.attributes.type !== port.type) {
-                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
-                    return false;
-                }
+                port = joint.shapes.logic.RAM.prototype.portList[mt.getAttribute('port')];
+            } else if (vt.model.attributes.type === REG) {
+                port = joint.shapes.logic.Register.prototype.portList[mt.getAttribute('port')];
+            } else if (vt.model.attributes.type === RF) {
+                port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
+            }  else if (vt.model.attributes.type === PM) {
+                port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
             }
+
+            if (port !== undefined && !verifyPortType(vl, port)) return false;
 
             // Set source & target ID to retrieve after removing
             vl.model.set('sourceId', vs.model.id);

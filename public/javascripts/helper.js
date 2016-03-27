@@ -148,6 +148,14 @@ var nextLabelIndex = function(cell, pos) {
     return (i === -1) ? cell.attributes.labels.length : i;
 }
 
+function verifyPortType(vl, port) {
+    if (vl.model.attributes.type !== port.type) {
+        notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
+        return false;
+    }
+    return true;
+}
+
 var file,reader,graphJSON;
 
 function handleFileSelect(evt) {
