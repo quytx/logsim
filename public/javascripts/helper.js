@@ -107,9 +107,9 @@ var RAM = 'logic.RAM';
 
 
 var busInputGates = [ MUX16, SPLITTER, SMC, REG, PM, RF, ALU ];
-var busOutputGates = [ MUX16, JOINER, SMC, REG, PM, RF, ALU ];
+var busOutputGates = [ MUX16, JOINER, SMC, REG, PM, RF, ALU, RAM ];
 var multiInputGates = [ JOINER ];
-var multiOutputValue = [ SMC, ALU, RF ];
+var multiOutputValueSamePort = [ SMC ];
 var mixInputTypes = [ REG, RF, ALU, RAM ];
 
 
@@ -125,8 +125,8 @@ var hasMultiInput = function(cell) {
     return _.indexOf(multiInputGates, cell.attributes.type) > -1;
 }
 
-var hasMultiOutputValues = function(cell) {
-    return _.indexOf(multiOutputValue, cell.attributes.type) > -1;
+var hasMultiOutputValuesSamePort = function(cell) {
+    return _.indexOf(multiOutputValueSamePort, cell.attributes.type) > -1;
 }
 
 var hasMixInput = function(cell) {

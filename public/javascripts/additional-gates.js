@@ -217,8 +217,11 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
 
     }, joint.shapes.logic.Gate.prototype.defaults),
 
-    dIn: 'in1',
-    we: 'in2',
+    portList: {
+        'in1': { label: 'din', type: 'logic.Bus'},
+        'in2': { label: 'we', type: 'logic.Wire'},
+        'out': { label: 'dout', type: 'logic.Bus'}
+    },
 
     initialize: function() {
         var self = this;
@@ -233,8 +236,8 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
         self.nextTimeStep = function(graph) {
             var dIn,we;
             graph.getConnectedLinks(self, {inbound: true}).forEach(function(link) {
-                if (link.attributes.target.port === self.dIn) dIn = link;
-                else if (link.attributes.target.port === self.we) we = link;
+                if (link.attributes.target.port === 'in1') dIn = link;
+                else if (link.attributes.target.port === 'in2') we = link;
             });
             if (dIn === undefined || we === undefined) return;
             if (self.clk === 0) {
@@ -312,8 +315,10 @@ joint.shapes.logic.PM = joint.shapes.basic.Generic.extend({
 
     }, joint.shapes.logic.Gate.prototype.defaults),
 
-    addr: 'in',
-    dout: 'out',
+    portList: {
+        'in': { label: 'addr', type: 'logic.Bus'},
+        'out': { label: 'dout', type: 'logic.Bus'}
+    },
 
     initialize: function() {
         // Resize
@@ -346,11 +351,13 @@ joint.shapes.logic.RF = joint.shapes.basic.Generic.extend({
 
     }, joint.shapes.logic.Gate.prototype.defaults),
 
-    addr: 'in1',
-    din: 'in2',
-    we: 'in3',
-    dout: 'out1',
-    x: 'out2',
+    portList: {
+        'in1': { label: 'addr', type: 'logic.Bus'},
+        'in2': { label: 'din', type: 'logic.Bus'},
+        'in3': { label: 'we', type: 'logic.Wire'},
+        'out1': { label: 'dout', type: 'logic.Bus'},
+        'out2': { label: 'x', type: 'logic.Bus'}
+    },
 
     initialize: function() {
         // Resize
@@ -380,11 +387,13 @@ joint.shapes.logic.RAM = joint.shapes.basic.Generic.extend({
         }
 
     }, joint.shapes.logic.Gate.prototype.defaults),
-
-    addr: 'in1',
-    din: 'in2',
-    we: 'in3',
-    dout: 'out',
+    
+    portList: {
+        'in1': { label: 'addr', type: 'logic.Bus'},
+        'in2': { label: 'din', type: 'logic.Bus'},
+        'in3': { label: 'we', type: 'logic.Wire'},
+        'out': { label: 'dout', type: 'logic.Bus'}
+    },
 
     initialize: function() {
         // Resize

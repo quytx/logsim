@@ -39,11 +39,36 @@ var rpaper = new joint.dia.Paper({
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
 
-            if (vl.model.attributes.type === BUS && ((vt.model.attributes.type === REG && mt.getAttribute('port') === vt.model.we)
-                || (vt.model.attributes.type === RAM && mt.getAttribute('port') === vt.model.we)
-                )) {
-                notify('Write-enable input must be a single bit', 'warning');
-                return false;
+            if (vt.model.attributes.type === RAM) {
+                var port = joint.shapes.logic.RAM.prototype.portList[mt.getAttribute('port')];
+                if (vl.model.attributes.type !== port.type) {
+                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
+                    return false;
+                }
+            }   
+
+            if (vt.model.attributes.type === REG) {
+                var port = joint.shapes.logic.Register.prototype.portList[mt.getAttribute('port')];
+                if (vl.model.attributes.type !== port.type) {
+                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
+                    return false;
+                }
+            }  
+
+            if (vt.model.attributes.type === RF) {
+                var port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
+                if (vl.model.attributes.type !== port.type) {
+                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
+                    return false;
+                }
+            }  
+
+            if (vt.model.attributes.type === PM) {
+                var port = joint.shapes.logic.PM.prototype.portList[mt.getAttribute('port')];
+                if (vl.model.attributes.type !== port.type) {
+                    notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
+                    return false;
+                }
             }
 
             // Set source & target ID to retrieve after removing
@@ -241,7 +266,7 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
     if (gate) {
         if (gate instanceof joint.shapes.logic.Splitter) {
             broadcastSplitter(gate);    // re-broadcast splitter
-        } else if (hasMultiOutputValues(gate)) {
+        } else if (hasMultiOutputValuesSamePort(gate)) {
             // Handle multiple output values here
 
             // Rename SMC
@@ -383,7 +408,7 @@ rgraph.on('change', function(cell) {
             setLabel(cell, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
         } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(cell, LBL_LEFT_POS)) {
             setLabel(cell, rgraph.getConnectedLinks(source, { outbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_LEFT_POS);
-        } else if (source !== null && hasMultiOutputValues(source) && hasNoLabel(cell, LBL_LEFT_POS)) {
+        } else if (source !== null && hasMultiOutputValuesSamePort(source) && hasNoLabel(cell, LBL_LEFT_POS)) {
             // get currently used labels
             var usedLabels = _.map(rgraph.getConnectedLinks(source, { outbound: true }), function(link){
                 if (link.attributes.labels === undefined) return undefined;
@@ -400,15 +425,21 @@ rgraph.on('change', function(cell) {
         } else if (target !== null && target.attributes.type === SMC && hasNoLabel(cell, LBL_RIGHT_POS)) {
             setLabel(cell, 'inst_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
         } else if (target !== null && target.attributes.type === REG && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            if (cell.attributes.target.port === target.dIn ) setLabel(cell, 'd_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-            if (cell.attributes.target.port === target.we ) setLabel(cell, 'we', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-            // console.log(rgraph.getConnectedLinks(target, {inbound: true}));
+            setLabel(cell, joint.shapes.logic.Register.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (source !== null && source.attributes.type === REG && hasNoLabel(cell, LBL_LEFT_POS)) {
+            setLabel(cell, joint.shapes.logic.Register.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
         } else if (target !== null && target.attributes.type === RAM && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            // Set input for RAM
-            if (cell.attributes.target.port === target.addr ) setLabel(cell, 'addr', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-            if (cell.attributes.target.port === target.din ) setLabel(cell, 'din', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-            if (cell.attributes.target.port === target.we ) setLabel(cell, 'we', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-
+            setLabel(cell, joint.shapes.logic.RAM.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (source !== null && source.attributes.type === RAM && hasNoLabel(cell, LBL_LEFT_POS)) {
+            setLabel(cell, joint.shapes.logic.RAM.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
+        } else if (target !== null && target.attributes.type === RF && hasNoLabel(cell, LBL_RIGHT_POS)) {
+            setLabel(cell, joint.shapes.logic.RF.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (source !== null && source.attributes.type === RF && hasNoLabel(cell, LBL_LEFT_POS)) {
+            setLabel(cell, joint.shapes.logic.RF.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
+        } else if (target !== null && target.attributes.type === PM && hasNoLabel(cell, LBL_RIGHT_POS)) {
+            setLabel(cell, joint.shapes.logic.PM.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (source !== null && source.attributes.type === PM && hasNoLabel(cell, LBL_LEFT_POS)) {
+            setLabel(cell, joint.shapes.logic.PM.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
         }
     }
 })
