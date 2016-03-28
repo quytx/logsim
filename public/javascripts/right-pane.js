@@ -23,21 +23,26 @@ var rpaper = new joint.dia.Paper({
     linkPinning: false,
     perpendicularLinks: false,
     defaultLink: function(cv,m) {
-        if (hasBusOutput(cv.model)) {
+        var portList = window.views[cv.model.attributes.type].prototype.portList;
+        // Only gates with bus port (portList must be defined)
+        if (portList !== undefined && portList[m.getAttribute('port')].type === BUS) {
             return new joint.shapes.logic.Bus;
-        } else {
-            return new joint.shapes.logic.Wire;
         }
+        return new joint.shapes.logic.Wire;
     }, 
 
     validateConnection: function(vs, ms, vt, mt, e, vl) {
 
         if (e === 'target') {
-            
-            if (hasBusOutput(vs.model) != hasBusInput(vt.model) && !hasMixInput(vt.model)) return false;   // validate bus connection
-
             // target requires an input port to connect
             if (!mt || !mt.getAttribute('class') || mt.getAttribute('class').indexOf('input') < 0) return false;
+
+            // must  be same type (wire - bus)
+            var portList = window.views[vt.model.attributes.type].prototype.portList;
+            if (portList === undefined && vl.model.attributes.type === BUS) return false;   // target cell doesnt have bus
+            if (portList !== undefined && portList[mt.getAttribute('port')].type !== vl.model.attributes.type) return false;  // type mismatch  
+
+            // if (hasBusOutput(vs.model) != hasBusInput(vt.model) && !hasMixInput(vt.model)) return false;   // validate bus connection
 
             var port;
 
@@ -203,7 +208,7 @@ function initializeSignal() {
     });
 
     // If not in simulation mode, return
-    if (!simulateOn) { return 0; }
+    if (!simulateOn) { return 1; }
 
 
     // Otherwise broadcast signals
