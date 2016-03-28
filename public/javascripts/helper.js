@@ -132,6 +132,7 @@ function loadGraph() {
 }
 
 function clearGraph() {
+    if (simulateOn) $("#resetBtn").click();
     rgraph.clear();
     notify("Cleared!", 'success');
 }
