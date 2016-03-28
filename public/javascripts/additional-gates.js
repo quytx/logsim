@@ -145,8 +145,8 @@ joint.shapes.logic.Bus = joint.dia.Link.extend({
             '.connection': { 'stroke-width': 6 },
             '.marker-vertex': { r: 7 }
         },
-        router: { name: 'orthogonal' },
-        connector: { name: 'rounded', args: { radius: 10 }}
+        // router: { name: 'orthogonal' },
+        connector: { name: 'smooth', args: { radius: 10 }}
     }, joint.dia.Link.prototype.defaults)
 
 });
