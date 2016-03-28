@@ -293,7 +293,7 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
                         if (busSize === undefined) {
                             busSize = bus.length;
                         } else if (busSize !== bus.length) {
-                            notify('Error: Bus inputs must be same size');
+                            notify('Error: Bus inputs of ' + gate.attributes.type.split('.')[1] + ' must be same size');
                             $("#resetBtn").click();
                             return;
                         }
