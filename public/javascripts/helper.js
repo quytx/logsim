@@ -67,6 +67,7 @@ var notify = function(text, type) {
 
 var multiInputValueSamePort = [ JOINER ];
 var multiOutputValueSamePort = [ SMC ];
+var discreteLabelBoxes = [ REG, RAM, RF, PM, ALU ];
 
 var hasMultiInputValuesSamePort = function(cell) {
     return _.indexOf(multiInputValueSamePort, cell.attributes.type) > -1;
@@ -74,6 +75,10 @@ var hasMultiInputValuesSamePort = function(cell) {
 
 var hasMultiOutputValuesSamePort = function(cell) {
     return _.indexOf(multiOutputValueSamePort, cell.attributes.type) > -1;
+}
+
+var hasDiscreteLabels = function(cell) {
+    return _.indexOf(discreteLabelBoxes, cell.attributes.type) > -1;
 }
 
 
