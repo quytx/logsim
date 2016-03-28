@@ -207,7 +207,7 @@ joint.shapes.logic.SMC = joint.shapes.basic.Generic.extend({
     }, joint.shapes.logic.Gate.prototype.defaults),
 
     portList: {
-        'in': { label: 'din', type: 'logic.Bus'},
+        'in': { label: 'inst_in', type: 'logic.Bus'},
         'out': { label: 'dout', type: 'logic.Bus'}
     },
     
