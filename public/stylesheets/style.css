@@ -4,6 +4,11 @@ body {
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+#version {
+    float: right;
+    font-style: italic;
+}
+
 #mainBody {
     margin-top: -2ex;
 }

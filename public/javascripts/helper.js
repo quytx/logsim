@@ -1,5 +1,5 @@
+var VERSION = "Version 1.0";
 // Add a new gate to the graph when a certain type of gate is clicked
-
 $(function() {
     window.views = {
         'logic.Input':      joint.shapes.logic.Input,
@@ -131,3 +131,4 @@ function clearGraph() {
 }
 
 document.getElementById('files').addEventListener('change', handleFileSelect, false);
+$("#version").html(VERSION);

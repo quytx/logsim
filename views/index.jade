@@ -1,6 +1,7 @@
 extends layout
 
 block content
+  div(id="version")
   div(id="fileDiv")
     input(type="file" accept=".json" id="files" name="files[]" ) 
     a.btn-md(id="saveBtn" onclick="saveGraph(this)") 
