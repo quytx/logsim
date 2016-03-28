@@ -384,6 +384,8 @@ rgraph.on('change', function(cell) {
     if (cell.isLink()) {
         var source = cell.getSourceElement();
         var target = cell.getTargetElement();
+        
+        // Special gates with multi-value inputs/outputs on same port
         if (target !== null && target.attributes.type === JOINER && hasNoLabel(cell, LBL_RIGHT_POS)) {
             setLabel(cell, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
         } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(cell, LBL_LEFT_POS)) {
@@ -404,26 +406,13 @@ rgraph.on('change', function(cell) {
             }
         } else if (target !== null && target.attributes.type === SMC && hasNoLabel(cell, LBL_RIGHT_POS)) {
             setLabel(cell, 'inst_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (target !== null && target.attributes.type === REG && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, joint.shapes.logic.Register.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && source.attributes.type === REG && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, joint.shapes.logic.Register.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
-        } else if (target !== null && target.attributes.type === RAM && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, joint.shapes.logic.RAM.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && source.attributes.type === RAM && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, joint.shapes.logic.RAM.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
-        } else if (target !== null && target.attributes.type === RF && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, joint.shapes.logic.RF.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && source.attributes.type === RF && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, joint.shapes.logic.RF.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
-        } else if (target !== null && target.attributes.type === PM && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, joint.shapes.logic.PM.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && source.attributes.type === PM && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, joint.shapes.logic.PM.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
-        } else if (target !== null && target.attributes.type === ALU && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, joint.shapes.logic.ALU.prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && source.attributes.type === ALU && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, joint.shapes.logic.ALU.prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
+        } 
+
+        // Other general boxes (each port is a single bus/wire)
+        else if (target !== null && window.views[target.attributes.type].prototype.portList !== undefined && hasNoLabel(cell, LBL_RIGHT_POS)) {
+            setLabel(cell, window.views[target.attributes.type].prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
+        } else if (source !== null && window.views[source.attributes.type].prototype.portList !== undefined && hasNoLabel(cell, LBL_LEFT_POS)) {
+            setLabel(cell, window.views[source.attributes.type].prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
         }
     }
 })
