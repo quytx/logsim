@@ -162,8 +162,8 @@ joint.shapes.logic.Joiner = joint.shapes.logic.Gate11.extend({
     }, joint.shapes.logic.Gate11.prototype.defaults),
     
     portList: {
-        'in': { label: 'in', type: 'logic.Wire'},
-        'out': { label: 'out', type: 'logic.Bus'}
+        'in': { label: '', type: 'logic.Wire'},
+        'out': { label: '', type: 'logic.Bus'}
     }
 
 });
@@ -179,8 +179,8 @@ joint.shapes.logic.Splitter = joint.shapes.logic.Gate11.extend({
     }, joint.shapes.logic.Gate11.prototype.defaults),
 
     portList: {
-        'in': { label: 'in', type: 'logic.Bus'},
-        'out': { label: 'out', type: 'logic.Wire'}
+        'in': { label: '', type: 'logic.Bus'},
+        'out': { label: '', type: 'logic.Wire'}
     }
 
 });
