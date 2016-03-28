@@ -13,7 +13,7 @@ $(function() {
         'logic.Xor':        joint.shapes.logic.Xor,
         'logic.Xnor':       joint.shapes.logic.Xnor,
         'logic.Mux21':      joint.shapes.logic.Mux21,
-        'logic.Mux21_16':   joint.shapes.logic.Mux21_16,
+        'logic.Mux21B':   joint.shapes.logic.Mux21B,
         'logic.Splitter':   joint.shapes.logic.Splitter,
         'logic.Joiner':     joint.shapes.logic.Joiner,
         'logic.SMC':        joint.shapes.logic.SMC,
@@ -28,7 +28,7 @@ $(function() {
 
 var WIRE = 'logic.Wire';
 var BUS = 'logic.Bus';
-var MUX16 = 'logic.Mux21_16';
+var MUX21B = 'logic.Mux21B';
 var SPLITTER = 'logic.Splitter';
 var JOINER = 'logic.Joiner';
 var SMC = 'logic.SMC';

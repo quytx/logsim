@@ -39,7 +39,7 @@ var lgates = {
     xor: new joint.shapes.logic.Xor({ position: { x: defaultX, y: defaultY + 5 * gapY }}),
     xnor: new joint.shapes.logic.Xnor({ position: { x: defaultXr, y: defaultY + 5 * gapY }}),
     mux21: new joint.shapes.logic.Mux21({ position: { x: defaultX, y: defaultY + 6 * gapY }}),
-    mux21_16: new joint.shapes.logic.Mux21_16({ position: { x: defaultXr, y: defaultY + 6 * gapY }}),
+    mux21b: new joint.shapes.logic.Mux21B({ position: { x: defaultXr, y: defaultY + 6 * gapY }}),
     joiner: new joint.shapes.logic.Joiner({ position: { x: defaultX, y: defaultY + 7 * gapY }}),
     splitter: new joint.shapes.logic.Splitter({ position: { x: defaultXr, y: defaultY + 7 * gapY }}),
     alu: new joint.shapes.logic.ALU({ position: { x: defaultX, y: defaultY + 8 * gapY }}),
