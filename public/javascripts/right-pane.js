@@ -138,6 +138,7 @@ function broadcastSplitter(gate) {
         var busIn = rgraph.getConnectedLinks(gate, { inbound: true});
         if (busIn.length > 1) {
             notify("Error: Splitter cannot have more than 1 input bus");
+            $("#resetBtn").click();
             return;
         }
         if (busIn[0] !== undefined) {
@@ -154,6 +155,7 @@ function broadcastSplitter(gate) {
             // Validate input and output size
             if (inputs !== undefined && inputs[0] !== undefined && outputs.length > inputs.length) {
                 notify('Error: Splitter cannot have more output wires (' + outputs.length + ') than input wires (' + inputs.length + ')');
+                $("#resetBtn").click();
                 return;
             }
 
@@ -292,6 +294,7 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
                             busSize = bus.length;
                         } else if (busSize !== bus.length) {
                             notify('Error: Bus inputs must be same size');
+                            $("#resetBtn").click();
                             return;
                         }
                     }
