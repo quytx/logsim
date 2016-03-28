@@ -39,26 +39,15 @@ var rpaper = new joint.dia.Paper({
 
             // must  be same type (wire - bus)
             var portList = window.views[vt.model.attributes.type].prototype.portList;
-            if (portList === undefined && vl.model.attributes.type === BUS) return false;   // target cell doesnt have bus
-            if (portList !== undefined && portList[mt.getAttribute('port')].type !== vl.model.attributes.type) return false;  // type mismatch  
-
-            // if (hasBusOutput(vs.model) != hasBusInput(vt.model) && !hasMixInput(vt.model)) return false;   // validate bus connection
-
-            var port;
-
-            if (vt.model.attributes.type === RAM) {
-                port = joint.shapes.logic.RAM.prototype.portList[mt.getAttribute('port')];
-            } else if (vt.model.attributes.type === REG) {
-                port = joint.shapes.logic.Register.prototype.portList[mt.getAttribute('port')];
-            } else if (vt.model.attributes.type === RF) {
-                port = joint.shapes.logic.RF.prototype.portList[mt.getAttribute('port')];
-            } else if (vt.model.attributes.type === PM) {
-                port = joint.shapes.logic.PM.prototype.portList[mt.getAttribute('port')];
-            } else if (vt.model.attributes.type === ALU) {
-                port = joint.shapes.logic.ALU.prototype.portList[mt.getAttribute('port')];
+            if (portList === undefined && vl.model.attributes.type === BUS) {
+                notify('' + vt.model.attributes.type.split('.')[1] + ' cannot connect to a Bus', 'warning');
+                return false;   // target cell doesnt have bus
             }
 
-            if (port !== undefined && !verifyPortType(vl, port)) return false;
+            if (portList !== undefined && portList[mt.getAttribute('port')].type !== vl.model.attributes.type) {
+                notify('Port "' + portList[mt.getAttribute('port')].label + '" of ' + vt.model.attributes.type.split('.')[1] + ' must connect to a ' + portList[mt.getAttribute('port')].type.split('.')[1], 'warning');
+                return false;  // type mismatch  
+            }
 
             // Set source & target ID to retrieve after removing
             vl.model.set('sourceId', vs.model.id);
