@@ -230,6 +230,14 @@ rgraph.on('change:source change:target', function(model, end) {
     var e = 'target' in model.changed ? 'target' : 'source';
 
     if ((model.previous(e).id && !model.get(e).id) || (!model.previous(e).id && model.get(e).id)) {
+        // if (model.previous(e).id && !model.get(e).id && model.isLink() && model.attributes.labels !== undefined) {
+        //     // console.log('target changed');
+        //     // var newLbl = model.attributes.labels;
+        //     // newLbl = _.without(newLbl, _.findWhere(newLbl, { position: LBL_RIGHT_POS }));
+        //     // model.set('labels', newLbl);
+        //     // model.remove();
+        //     // SHOULD NOT ALLOW THIS
+        // }
         // if source/target has been connected to a port or disconnected from a port reinitialize signals
         current = initializeSignal();
     }
