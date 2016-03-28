@@ -121,8 +121,14 @@ function loadGraph() {
         alert("Please select a file first!");
         return; 
     }
-    rgraph.fromJSON(graphJSON);
-    notify("Successfully loaded!", 'success');
+    try {
+        rgraph.fromJSON(graphJSON);
+        notify("Successfully loaded!", 'success');
+    } catch (err) {
+        console.error(err);
+        notify("Error: The saved file is from an older version. The circuit might not work as expected!");
+    }
+    
 }
 
 function clearGraph() {
