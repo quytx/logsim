@@ -65,32 +65,18 @@ var notify = function(text, type) {
 }
 
 
-var busInputGates = [ MUX16, SPLITTER, SMC, REG, PM, RF, ALU ];
-var busOutputGates = [ MUX16, JOINER, SMC, REG, PM, RF, ALU, RAM ];
-var multiInputGates = [ JOINER ];
+var multiInputValueSamePort = [ JOINER ];
 var multiOutputValueSamePort = [ SMC ];
-var mixInputTypes = [ REG, RF, ALU, RAM ];
 
-
-var hasBusInput = function(cell) {
-    return _.indexOf(busInputGates, cell.attributes.type) > -1;
-}
-
-var hasBusOutput = function(cell) {
-    return _.indexOf(busOutputGates, cell.attributes.type) > -1;
-}
-
-var hasMultiInput = function(cell) {
-    return _.indexOf(multiInputGates, cell.attributes.type) > -1;
+var hasMultiInputValuesSamePort = function(cell) {
+    return _.indexOf(multiInputValueSamePort, cell.attributes.type) > -1;
 }
 
 var hasMultiOutputValuesSamePort = function(cell) {
     return _.indexOf(multiOutputValueSamePort, cell.attributes.type) > -1;
 }
 
-var hasMixInput = function(cell) {
-    return _.indexOf(mixInputTypes, cell.attributes.type) > -1;
-}
+
 
 var setLabel = function(link, label, index, optionalPos) {
     var pos = optionalPos === undefined ? 0.5 : optionalPos;
@@ -107,13 +93,6 @@ var nextLabelIndex = function(cell, pos) {
     return (i === -1) ? cell.attributes.labels.length : i;
 }
 
-function verifyPortType(vl, port) {
-    if (vl.model.attributes.type !== port.type) {
-        notify('' + port.label + ' input must be a ' + port.type.split('.')[1], 'warning');
-        return false;
-    }
-    return true;
-}
 
 var file,reader,graphJSON;
 

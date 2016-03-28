@@ -54,7 +54,7 @@ var rpaper = new joint.dia.Paper({
             vl.model.set('targetId', vt.model.id);
 
             // Allow multi-input
-            if (hasMultiInput(vt.model)) return true;    // no need to check if port already used
+            if (hasMultiInputValuesSamePort(vt.model)) return true;    // no need to check if port already used
 
             // check whether the port is being already used
             var portUsed = _.find(this.model.getLinks(), function(link) {
