@@ -80,16 +80,33 @@ setGrid(rpaper, gridSize, gridColor);
 // scale
 rpaper.scale(scale.x, scale.y);
 
-rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
-    var bbox = cellView.getBBox();
-    var constrained = false;
-    var constrainedX = x;
-    if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
-    if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
-    var constrainedY = y;
-    if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
-    if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
-    if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
+// rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
+//     var bbox = cellView.getBBox();
+//     var constrained = false;
+//     var constrainedX = x;
+//     if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
+//     if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
+//     var constrainedY = y;
+//     if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
+//     if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
+//     if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
+// });
+
+// On right click element
+rpaper.on('cell:pointerdblclick', function(cv, evt, x, y) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    cv.model.remove();
+});
+
+rpaper.on('blank:contextmenu', function(evt, x, y) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    if (selectedGate !== undefined) {
+        addGate(rgraph, selectedGate, x, y);
+    } else {
+        notify("No gate selected", 'warning');
+    }
 });
 
 // Zoom in 

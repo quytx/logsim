@@ -54,6 +54,9 @@ var lgates = {
 
 };
 
+var selectedGate;
+var highlightedCell;
+
 
 var resetLeftPane = function(cells) {
     lgraph.resetCells(_.toArray(cells));
@@ -63,7 +66,11 @@ var resetLeftPane = function(cells) {
 resetLeftPane(lgates);
 
 lpaper.on('cell:pointerdown', function(cellView, evt, x, y) { 
-    addGate(rgraph, cellView.model.attributes.type, 50, 50);
+    // addGate(rgraph, cellView.model.attributes.type, 50, 50);
+    if (highlightedCell !== undefined) highlightedCell.unhighlight();
+    cellView.highlight();
+    highlightedCell = cellView;
+    selectedGate = cellView.model.attributes.type;
 })
 
 
