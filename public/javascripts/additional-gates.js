@@ -519,7 +519,7 @@ joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
                 self.clk++;
                 if (self.clk % 2 === 0) {   // Only increase once per clock
                     self.seq = self.seq.slice(0, -1);
-                    console.log(self.seq);
+                    // console.log(self.seq);
                 }
             }
         }
