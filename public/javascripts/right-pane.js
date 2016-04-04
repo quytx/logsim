@@ -99,6 +99,17 @@ rpaper.on('cell:pointerdblclick', function(cv, evt, x, y) {
     cv.model.remove();
 });
 
+// on click 
+rpaper.on('cell:pointerclick', function(cv, evt, x, y) {
+    if (cv.model instanceof joint.shapes.logic.SeqIn) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        var str = prompt('Please enter input string:');
+        cv.model.setSeq.call(cv.model, str);
+    }
+    
+});
+
 rpaper.on('blank:contextmenu', function(evt, x, y) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -125,7 +136,7 @@ $('#zoomOutBtn').click(function() {
 
 function resetFlipFlops() {
     _.each(rgraph.getElements(), function(element) {
-        hasFlipFlop(element) && element.reset.apply();
+        hasTimeStep(element) && element.reset.apply();
     });
 }
 
@@ -188,10 +199,10 @@ function broadcastSplitter(gate) {
 // 2x
 function incrDff(graph) {
     _.each(graph.getElements(), function(element) {
-        hasFlipFlop(element) && element.nextTimeStep.call(element, graph);
+        hasTimeStep(element) && element.nextTimeStep.call(element, graph);
     });
     _.each(graph.getElements(), function(element) {
-        hasFlipFlop(element) && element.nextTimeStep.call(element, graph);
+        hasTimeStep(element) && element.nextTimeStep.call(element, graph);
     });
     timeStep++;
 }
@@ -224,6 +235,7 @@ function initializeSignal() {
         // broadcast a new signal from every input in the rgraph
         (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, 1);
         (element instanceof joint.shapes.logic.InputLow) && broadcastSignal(element, -1);
+        (element instanceof joint.shapes.logic.SeqIn) && element.hasInput.call(element) && broadcastSignal(element, element.operation.call(element));
     });
 
     return 1;
@@ -492,7 +504,7 @@ $("#simBtn").click(function() {
     $("#resetBtn").css('visibility', 'visible');
 
     var sequentialLogic = _.some(rgraph.getElements(), function(element) {
-        return hasFlipFlop(element) && rgraph.getConnectedLinks(element, {inbound : true}).length > 0;
+        return (element instanceof joint.shapes.logic.SeqIn && element.hasInput.call(element)) || (hasTimeStep(element) && rgraph.getConnectedLinks(element, {inbound : true}).length > 0);
     });
 
     if (sequentialLogic) {

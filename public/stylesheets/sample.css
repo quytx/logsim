@@ -136,6 +136,13 @@
     transition: all 0.2s;
 }
 
+.element .seqin {
+    fill: yellow;
+    stroke: #000;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+
 
 
 .element circle {

@@ -474,3 +474,68 @@ joint.shapes.logic.RAM = joint.shapes.basic.Generic.extend({
 });
 
 
+// Input Sequence
+joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
+    markup: '<g class="rotatable"><g class="scalable"><rect class="seqin"/></g><text/><circle class="output"/></g>',
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.SeqIn',
+        attrs: {
+            rect: { fill: 'white', rx: 2, ry: 2, stroke: 'black', 'stroke-width': 1.5, 'follow-scale': true, width: 80, height: 40 },
+            text: {
+                text: 'Input Sequence', 'font-size': 16, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle'
+            },
+            '.seqin': { width: 100, height: 50 },
+            circle: { r: 7, stroke: 'black', fill: 'white', 'stroke-width': 2 },
+            '.output': { ref: '.seqin', 'ref-dx': 0, 'ref-y': 0.5, magnet: true, port: 'out' }
+        }
+
+    }, joint.shapes.logic.Gate.prototype.defaults),
+    
+    initialize: function() {
+        var self = this;
+        // Resize
+        self.clk = 0;
+        self.defaultSeq = undefined;
+        self.seq = self.defaultSeq;
+
+        self.reset = function() {
+            self.clk = 0;
+            self.seq = self.defaultSeq;
+        }
+
+        self.setSeq = function(seq) {
+            self.defaultSeq = seq;
+            self.seq = seq;
+        }
+
+        self.hasInput = function() {
+            return self.seq !== undefined && self.seq.length > 0;
+        }
+
+        self.nextTimeStep = function() {
+            if (self.hasInput) {
+                self.clk++;
+                if (self.clk % 2 === 0) {   // Only increase once per clock
+                    self.seq = self.seq.slice(0, -1);
+                    console.log(self.seq);
+                }
+            }
+        }
+
+        self.operation = function() {
+            if (self.hasInput)
+                return parseInt(self.seq.slice(-1)) === 1 ? 1 : -1;
+            else {
+                notify("Input string ended, will be treated as 0");
+                return -1;
+            }
+        }
+
+        self.set({ size: { width: 150, height: 40 } } );
+        joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
+    }
+});
+
+
