@@ -125,7 +125,7 @@ $('#zoomOutBtn').click(function() {
 
 function resetFlipFlops() {
     _.each(rgraph.getElements(), function(element) {
-        (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.reset.apply();
+        hasFlipFlop(element) && element.reset.apply();
     });
 }
 
@@ -185,13 +185,13 @@ function broadcastSplitter(gate) {
     } 
 }
 
-
+// 2x
 function incrDff(graph) {
     _.each(graph.getElements(), function(element) {
-        (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.nextTimeStep.call(element, graph);
+        hasFlipFlop(element) && element.nextTimeStep.call(element, graph);
     });
     _.each(graph.getElements(), function(element) {
-        (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register) && element.nextTimeStep.call(element, graph);
+        hasFlipFlop(element) && element.nextTimeStep.call(element, graph);
     });
     timeStep++;
 }
@@ -293,12 +293,12 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
 
 
         
-        } else if (gate instanceof joint.shapes.logic.Register) {
-            // broadcast
+        } else if (gate instanceof joint.shapes.logic.Register || gate instanceof joint.shapes.logic.DffB) {
+            // Gate uses its own operation function declared in additional-gate.js
             broadcastBus(gate, gate.operation.apply(gate));
         } 
         else {
-            // multi-bus input with 1 output handle here, e.g. Mux 16
+            // combinational bus gates (multiple bus inputs with 1 bus output) handle here, e.g. Mux 16, 3-bit AND, 4-bit AND, etc.
             // Get all input buses
             var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
             .sortBy(function(bus) {
@@ -404,41 +404,50 @@ rgraph.on('change:signal', function(wire, signal) {
    }
 });
 
+
+
+// Labeling links
+function labelLink(link) {
+    var source = link.getSourceElement();
+    var target = link.getTargetElement();
+    
+    // Special gates with multi-value inputs/outputs on same port
+    if (target !== null && target.attributes.type === JOINER && hasNoLabel(link, LBL_RIGHT_POS)) {
+        setLabel(link, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
+    } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(link, LBL_LEFT_POS)) {
+        setLabel(link, rgraph.getConnectedLinks(source, { outbound: true }).length - 1, nextLabelIndex(link, LBL_RIGHT_POS), LBL_LEFT_POS);
+    } else if (source !== null && hasMultiOutputValuesSamePort(source) && hasNoLabel(link, LBL_LEFT_POS)) {
+        // get currently used labels
+        var usedLabels = _.map(rgraph.getConnectedLinks(source, { outbound: true }), function(link){
+            if (link.attributes.labels === undefined) return undefined;
+            return link.attributes.labels[nextLabelIndex(link, LBL_LEFT_POS)].attrs.text.text;
+        });
+        // find first unused label
+        var unusedLabels = _.difference(source.outputsList.apply(source), usedLabels);
+        if (unusedLabels !== undefined && unusedLabels.length > 0) {
+            setLabel(link, unusedLabels[0], nextLabelIndex(link, LBL_LEFT_POS), LBL_LEFT_POS);
+        } else if (unusedLabels.length == 0) {
+            // Remove immediately if reached maximum number of outputs
+            link.remove();
+        }
+    } else if (target !== null && target.attributes.type === SMC && hasNoLabel(link, LBL_RIGHT_POS)) {
+        setLabel(link, 'inst_in', nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
+    } 
+
+    // Other general boxes (each port is a single bus/wire)
+    else if (target !== null && window.views[target.attributes.type].prototype.portList !== undefined && hasNoLabel(link, LBL_RIGHT_POS)) {
+        setLabel(link, window.views[target.attributes.type].prototype.portList[link.attributes.target.port].label, nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
+    } else if (source !== null && window.views[source.attributes.type].prototype.portList !== undefined && hasNoLabel(link, LBL_LEFT_POS)) {
+        setLabel(link, window.views[source.attributes.type].prototype.portList[link.attributes.source.port].label, nextLabelIndex(link, LBL_LEFT_POS), LBL_LEFT_POS);
+    }
+}
+
+
+
 // Handle labeling (potentially other actions if needed) when a new wire/bus is added from a gate
 rgraph.on('change', function(cell) {
     if (cell.isLink()) {
-        var source = cell.getSourceElement();
-        var target = cell.getTargetElement();
-        
-        // Special gates with multi-value inputs/outputs on same port
-        if (target !== null && target.attributes.type === JOINER && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, rgraph.getConnectedLinks(source, { outbound: true }).length - 1, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_LEFT_POS);
-        } else if (source !== null && hasMultiOutputValuesSamePort(source) && hasNoLabel(cell, LBL_LEFT_POS)) {
-            // get currently used labels
-            var usedLabels = _.map(rgraph.getConnectedLinks(source, { outbound: true }), function(link){
-                if (link.attributes.labels === undefined) return undefined;
-                return link.attributes.labels[nextLabelIndex(cell, LBL_LEFT_POS)].attrs.text.text;
-            });
-            // find first unused label
-            var unusedLabels = _.difference(source.outputsList.apply(source), usedLabels);
-            if (unusedLabels !== undefined && unusedLabels.length > 0) {
-                setLabel(cell, unusedLabels[0], nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
-            } else if (unusedLabels.length == 0) {
-                // Remove immediately if reached maximum number of outputs
-                cell.remove();
-            }
-        } else if (target !== null && target.attributes.type === SMC && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, 'inst_in', nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } 
-
-        // Other general boxes (each port is a single bus/wire)
-        else if (target !== null && window.views[target.attributes.type].prototype.portList !== undefined && hasNoLabel(cell, LBL_RIGHT_POS)) {
-            setLabel(cell, window.views[target.attributes.type].prototype.portList[cell.attributes.target.port].label, nextLabelIndex(cell, LBL_RIGHT_POS), LBL_RIGHT_POS);
-        } else if (source !== null && window.views[source.attributes.type].prototype.portList !== undefined && hasNoLabel(cell, LBL_LEFT_POS)) {
-            setLabel(cell, window.views[source.attributes.type].prototype.portList[cell.attributes.source.port].label, nextLabelIndex(cell, LBL_LEFT_POS), LBL_LEFT_POS);
-        }
+        labelLink(cell);
     }
 })
 
@@ -483,8 +492,7 @@ $("#simBtn").click(function() {
     $("#resetBtn").css('visibility', 'visible');
 
     var sequentialLogic = _.some(rgraph.getElements(), function(element) {
-        return (element instanceof joint.shapes.logic.Dff || element instanceof joint.shapes.logic.Register)
-               && rgraph.getConnectedLinks(element, {inbound : true}).length > 0;
+        return hasFlipFlop(element) && rgraph.getConnectedLinks(element, {inbound : true}).length > 0;
     });
 
     if (sequentialLogic) {

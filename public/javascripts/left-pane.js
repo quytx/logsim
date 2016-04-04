@@ -32,6 +32,7 @@ var lgates = {
     // Logic gates
     not: new joint.shapes.logic.Not({ position: { x: defaultX, y: defaultY + 2 * gapY }}),
     dff: new joint.shapes.logic.Dff({ position: { x: defaultXr, y: defaultY + 2 * gapY }}),
+    dffb: new joint.shapes.logic.DffB({ position: { x: defaultXr, y: defaultY + 1 * gapY }}),
     and: new joint.shapes.logic.And({ position: { x: defaultX, y: defaultY + 3 * gapY }}),
     nand: new joint.shapes.logic.Nand({ position: { x: defaultXr, y: defaultY + 3 * gapY }}),
     or: new joint.shapes.logic.Or({ position: { x: defaultX, y: defaultY + 4 * gapY }}),
