@@ -24,7 +24,8 @@ $(function() {
         'logic.Register':   joint.shapes.logic.Register,
         'logic.Dff':        joint.shapes.logic.Dff,
         'logic.DffB':       joint.shapes.logic.DffB,
-        'logic.SeqIn':      joint.shapes.logic.SeqIn
+        'logic.SeqIn':      joint.shapes.logic.SeqIn,
+        'logic.Counter':    joint.shapes.logic.Counter
     };
 });
 
@@ -42,6 +43,7 @@ var RAM = 'logic.RAM';
 var DFF = 'logic.Dff';
 var DFFB = 'logic.DffB';
 var SEQIN = 'logic.SeqIn';
+var COUNTER = 'logic.Counter';
 
 var addGate = function(graph, type, xpos, ypos) {
     var newGate = new window.views[type]({ position: { x: xpos, y: ypos}});
@@ -73,7 +75,8 @@ var notify = function(text, type) {
 
 var multiInputValueSamePort = [ JOINER ];
 var multiOutputValueSamePort = [ SMC ];
-var gateWithTimeSteps = [ REG, DFF, DFFB, SEQIN ];
+var gateWithTimeSteps = [ REG, DFF, DFFB, SEQIN, COUNTER ];
+var doubleTimeSteps = [ REG, DFF ];
 
 var hasMultiInputValuesSamePort = function(cell) {
     return _.indexOf(multiInputValueSamePort, cell.attributes.type) > -1;
@@ -85,6 +88,10 @@ var hasMultiOutputValuesSamePort = function(cell) {
 
 var hasTimeStep = function(cell) {
     return _.indexOf(gateWithTimeSteps, cell.attributes.type) > -1;
+}
+
+var hasDoubleTimeSteps = function(cell) {
+    return _.indexOf(doubleTimeSteps, cell.attributes.type) > -1;
 }
 
 

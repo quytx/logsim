@@ -296,12 +296,12 @@ joint.shapes.logic.Register = joint.shapes.basic.Generic.extend({
         var self = this;
         self.outQ = undefined;
         self.clk = 0;
+        
         self.reset = function() {
-            // console.log('reseting reg');
             self.outQ = undefined;
             self.clk = 0;
-            // console.log(self);
         }
+
         self.nextTimeStep = function(graph) {
             var dIn,we;
             graph.getConnectedLinks(self, {inbound: true}).forEach(function(link) {
@@ -437,6 +437,8 @@ joint.shapes.logic.RF = joint.shapes.basic.Generic.extend({
     }
 });
 
+
+
 // RAM: 3 in 1 out
 joint.shapes.logic.RAM = joint.shapes.basic.Generic.extend({
     markup: '<g class="rotatable"><g class="scalable"><rect class="ram"/></g><text/><circle class="input1"/><circle class="input2"/><circle class="input3"/><circle class="output"/></g>',
@@ -495,13 +497,11 @@ joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
     
     initialize: function() {
         var self = this;
-        // Resize
-        self.clk = 0;
+
         self.defaultSeq = undefined;
         self.seq = self.defaultSeq;
 
         self.reset = function() {
-            self.clk = 0;
             self.seq = self.defaultSeq;
         }
 
@@ -521,12 +521,8 @@ joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
 
         self.nextTimeStep = function() {
             if (self.hasInput()) {
-                self.clk++;
-                if (self.clk % 2 === 0) {   // Only increase once per clock
-                    self.seq = self.seq.slice(0, -1);
-                    self.updateLabel();
-                    // console.log(self.seq);
-                }
+                self.seq = self.seq.slice(0, -1);
+                self.updateLabel();
             }
         }
 
@@ -539,9 +535,48 @@ joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
             }
         }
 
-        self.set({ size: { width: 150, height: 40 } } );
+        self.set({ size: { width: 210, height: 40 } } );
         joint.shapes.basic.Generic.prototype.initialize.apply(this, arguments);
     }
 });
 
 
+
+joint.shapes.logic.Counter = joint.shapes.logic.IO.extend({
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.Counter',
+        attrs: {
+            '.wire': { 'ref-x': 0, d: 'M 0 0 L -23 0' },
+            circle: { ref: '.body', 'ref-x': -30, 'ref-y': 0.5, magnet: 'passive', 'class': 'input', port: 'in' },
+            text: { text: 'Counter' }
+        }
+
+    }, joint.shapes.logic.IO.prototype.defaults),
+
+    initialize: function() {
+        var self = this;
+        self.count = 0;
+
+        self.reset = function() {
+            self.count = 0;
+            self.attr('text/text', 'Counter');
+        }
+
+        self.nextTimeStep = function(graph) {
+            // Get current input, increase count if input is high
+            var inputs = graph.getConnectedLinks(self, {inbound: true});
+            if (inputs !== undefined && inputs.length === 1) {
+                var signal = inputs[0].get('signal');
+                if (signal === 1 || signal === true) {
+                    self.count++;
+                    self.attr('text/text', self.count);
+                }
+            }
+        }
+        
+        joint.shapes.logic.IO.prototype.initialize.apply(this, arguments);
+    }
+
+});

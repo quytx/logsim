@@ -77,20 +77,10 @@ var rpaper = new joint.dia.Paper({
 // grid lines
 setGrid(rpaper, gridSize, gridColor);
 
+
 // scale
 rpaper.scale(scale.x, scale.y);
 
-// rpaper.on('cell:pointermove', function (cellView, evt, x, y) {
-//     var bbox = cellView.getBBox();
-//     var constrained = false;
-//     var constrainedX = x;
-//     if (bbox.x <= 0) { constrainedX = x + gridSize; constrained = true }
-//     if (bbox.x + bbox.width >= width) { constrainedX = x - gridSize; constrained = true }
-//     var constrainedY = y;
-//     if (bbox.y <= 0) {  constrainedY = y + gridSize; constrained = true }
-//     if (bbox.y + bbox.height >= height) { constrainedY = y - gridSize; constrained = true }
-//     if (constrained) { cellView.pointermove(evt, constrainedX, constrainedY) }
-// });
 
 // On right click element
 rpaper.on('cell:pointerdblclick', function(cv, evt, x, y) {
@@ -200,9 +190,10 @@ function broadcastSplitter(gate) {
 function incrDff(graph) {
     _.each(graph.getElements(), function(element) {
         hasTimeStep(element) && element.nextTimeStep.call(element, graph);
-    });
-    _.each(graph.getElements(), function(element) {
-        hasTimeStep(element) && element.nextTimeStep.call(element, graph);
+
+        // If flip-flop: do another call for a full clock, since nextTimeStep only incr 1/2 clock in the implementation
+        if (hasDoubleTimeSteps(element))
+            element.nextTimeStep.call(element, graph);
     });
     timeStep++;
 }
@@ -219,8 +210,6 @@ function initializeSignal() {
         return !(link instanceof joint.shapes.logic.Bus);
     }).value(), 'unset', 'busSignal');
 
-    // _.invoke(rgraph.getLinks(), 'set', 'signal', 0);
-
     // remove all 'live' classes
     $('.live').each(function() {
         V(this).removeClass('live');
@@ -228,7 +217,6 @@ function initializeSignal() {
 
     // If not in simulation mode, return
     if (!simulateOn) { return 1; }
-
 
     // Otherwise broadcast signals
     _.each(rgraph.getElements(), function(element) {

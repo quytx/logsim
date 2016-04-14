@@ -51,7 +51,8 @@ var lgates = {
     rf: new joint.shapes.logic.RF({ position: { x: defaultXr, y: defaultY + 11 * gapY + 10 }}),
     ram: new joint.shapes.logic.RAM({ position: { x: defaultX, y: defaultY + 11 * gapY + 10 }}),
     
-    seqin: new joint.shapes.logic.SeqIn({ position: { x: defaultX, y: defaultY + 13 * gapY }})
+    seqin: new joint.shapes.logic.SeqIn({ position: { x: defaultX, y: defaultY + 13 * gapY }}),
+    counter: new joint.shapes.logic.Counter({ position: { x: defaultX + 28, y: defaultY + 14 * gapY }})
     // More gates here (remember to add to helper.js as well)
 
 };
