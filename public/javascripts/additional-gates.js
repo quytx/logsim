@@ -505,9 +505,14 @@ joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
             self.seq = self.defaultSeq;
         }
 
+        self.updateLabel = function() {
+            self.attr('text/text', self.seq || 'Input Sequence');
+        }
+
         self.setSeq = function(seq) {
             self.defaultSeq = seq;
             self.seq = seq;
+            self.updateLabel();
         }
 
         self.hasInput = function() {
@@ -515,10 +520,11 @@ joint.shapes.logic.SeqIn = joint.shapes.basic.Generic.extend({
         }
 
         self.nextTimeStep = function() {
-            if (self.hasInput) {
+            if (self.hasInput()) {
                 self.clk++;
                 if (self.clk % 2 === 0) {   // Only increase once per clock
                     self.seq = self.seq.slice(0, -1);
+                    self.updateLabel();
                     // console.log(self.seq);
                 }
             }
