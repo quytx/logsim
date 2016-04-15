@@ -11,7 +11,7 @@ var LBL_LEFT_POS = 0.2;
 var LBL_RIGHT_POS = 0.8;
 var NUM_STATE_BIT = 5;
 
-
+///////////////// SET UP NEW GRAPH ////////////////////////
 var rgraph = new joint.dia.Graph();
 
 var rpaper = new joint.dia.Paper({
@@ -19,10 +19,10 @@ var rpaper = new joint.dia.Paper({
     el: $('#right-col'),
     model: rgraph,
     width: width, height: height, gridSize: gridSize,
-    snapLinks: false,
-    linkPinning: false,
+    snapLinks: false,   // if true, force a dragged link to snap to the closest element/port 
+    linkPinning: false, // links must connects to a port, cannot be pinned on a blank area
     perpendicularLinks: false,
-    defaultLink: function(cv,m) {
+    defaultLink: function(cv,m) {   // decide whether to create a wire or a bus based on the source port
         var portList = window.views[cv.model.attributes.type].prototype.portList;
         // Only gates with bus port (portList must be defined)
         if (portList !== undefined && portList[m.getAttribute('port')].type === BUS) {
@@ -110,21 +110,8 @@ rpaper.on('blank:contextmenu', function(evt, x, y) {
     }
 });
 
-// Zoom in 
-$('#zoomInBtn').click(function() {
-    scale.x = scale.x * scale.rate;
-    scale.y = scale.y * scale.rate;
-    rpaper.scale(scale.x, scale.y);
-});
-
-// Zoom out
-$('#zoomOutBtn').click(function() {
-    scale.x = scale.x / scale.rate;
-    scale.y = scale.y / scale.rate;
-    rpaper.scale(scale.x, scale.y);
-});
-
-function resetFlipFlops() {
+/////////////////////////// FUNCTION DEFINITION  ////////////////////////////
+function resetTimeStep() {
     _.each(rgraph.getElements(), function(element) {
         hasTimeStep(element) && element.reset.apply();
     });
@@ -133,7 +120,7 @@ function resetFlipFlops() {
 function reset() {
     simulateOn = false;
     timeStep = 0;
-    resetFlipFlops();
+    resetTimeStep();
     initializeSignal();
 }
 
@@ -186,8 +173,8 @@ function broadcastSplitter(gate) {
     } 
 }
 
-// 2x
-function incrDff(graph) {
+// Next time step
+function incrTimeStep(graph) {
     _.each(graph.getElements(), function(element) {
         hasTimeStep(element) && element.nextTimeStep.call(element, graph);
 
@@ -196,6 +183,42 @@ function incrDff(graph) {
             element.nextTimeStep.call(element, graph);
     });
     timeStep++;
+}
+
+// Labeling links
+function labelLink(link) {
+    var source = link.getSourceElement();
+    var target = link.getTargetElement();
+    
+    // Special gates with multi-value inputs/outputs on same port
+    if (target !== null && target.attributes.type === JOINER && hasNoLabel(link, LBL_RIGHT_POS)) {
+        setLabel(link, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
+    } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(link, LBL_LEFT_POS)) {
+        setLabel(link, rgraph.getConnectedLinks(source, { outbound: true }).length - 1, nextLabelIndex(link, LBL_RIGHT_POS), LBL_LEFT_POS);
+    } else if (source !== null && hasMultiOutputValuesSamePort(source) && hasNoLabel(link, LBL_LEFT_POS)) {
+        // get currently used labels
+        var usedLabels = _.map(rgraph.getConnectedLinks(source, { outbound: true }), function(link){
+            if (link.attributes.labels === undefined) return undefined;
+            return link.attributes.labels[nextLabelIndex(link, LBL_LEFT_POS)].attrs.text.text;
+        });
+        // find first unused label
+        var unusedLabels = _.difference(source.outputsList.apply(source), usedLabels);
+        if (unusedLabels !== undefined && unusedLabels.length > 0) {
+            setLabel(link, unusedLabels[0], nextLabelIndex(link, LBL_LEFT_POS), LBL_LEFT_POS);
+        } else if (unusedLabels.length == 0) {
+            // Remove immediately if reached maximum number of outputs
+            link.remove();
+        }
+    } else if (target !== null && target.attributes.type === SMC && hasNoLabel(link, LBL_RIGHT_POS)) {
+        setLabel(link, 'inst_in', nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
+    } 
+
+    // Other general boxes (each port is a single bus/wire)
+    else if (target !== null && window.views[target.attributes.type].prototype.portList !== undefined && hasNoLabel(link, LBL_RIGHT_POS)) {
+        setLabel(link, window.views[target.attributes.type].prototype.portList[link.attributes.target.port].label, nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
+    } else if (source !== null && window.views[source.attributes.type].prototype.portList !== undefined && hasNoLabel(link, LBL_LEFT_POS)) {
+        setLabel(link, window.views[source.attributes.type].prototype.portList[link.attributes.source.port].label, nextLabelIndex(link, LBL_LEFT_POS), LBL_LEFT_POS);
+    }
 }
 
 
@@ -243,6 +266,9 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 
 var current = {};
 
+
+//////////////////////////// HANDLING EVENTS (WHEN DIAGRAM CHANGES) //////////////////////////////
+
 rgraph.on('change:source change:target', function(model, end) {
     var e = 'target' in model.changed ? 'target' : 'source';
 
@@ -258,6 +284,62 @@ rgraph.on('change:source change:target', function(model, end) {
         // if source/target has been connected to a port or disconnected from a port reinitialize signals
         current = initializeSignal();
     }
+});
+
+
+rgraph.on('change:signal', function(wire, signal) {
+    // console.log('wire signal changed');
+
+    toggleLive(wire, signal);
+
+    var magnitude = Math.abs(signal);
+
+    // if a new signal has been generated stop transmitting the old one
+    if (magnitude !== current) return;
+
+    var gate = rgraph.getCell(wire.get('target').id);   // target
+
+    if (gate) {
+        if (gate instanceof joint.shapes.logic.Joiner) {
+
+            var busIn = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
+            .sortBy(function(input) {
+                return input.attributes.labels[nextLabelIndex(input, LBL_RIGHT_POS)].attrs.text.text;
+            })
+            .map(function(input) {
+                return input.attributes.signal;
+            })
+            .value();
+            broadcastBus(gate, busIn);
+        } else if (gate instanceof joint.shapes.logic.Register) {
+            // broadcast
+            broadcastBus(gate, gate.operation.apply(gate));
+        }
+
+
+        // For other combinational-logic gates like and, or, xor, etc.
+        else {
+            gate.onSignal(signal, function() {
+                // get an array of signals on all input ports
+                var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
+                    .sortBy(function(wire) { 
+                        return wire.get('target').port;     // sort all inputs based on labels (in1, in2, ...)
+                    })
+                    .groupBy(function(wire) {
+                        return wire.get('target').port;
+                    })
+                    .map(function(wires) {
+                        return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
+                    })
+                    .value();
+                // calculate the output signal
+                // console.log(inputs);
+                var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
+                
+                broadcastSignal(gate, output);
+            });
+        }
+   }
 });
 
 
@@ -349,98 +431,8 @@ rgraph.on('change:busSignal', function(bus, busSignal) {
    }
 });
 
-rgraph.on('change:signal', function(wire, signal) {
-    // console.log('wire signal changed');
-
-    toggleLive(wire, signal);
-
-    var magnitude = Math.abs(signal);
-
-    // if a new signal has been generated stop transmitting the old one
-    if (magnitude !== current) return;
-
-    var gate = rgraph.getCell(wire.get('target').id);   // target
-
-    if (gate) {
-        if (gate instanceof joint.shapes.logic.Joiner) {
-
-            var busIn = _.chain(rgraph.getConnectedLinks(gate, { inbound: true}))
-            .sortBy(function(input) {
-                return input.attributes.labels[nextLabelIndex(input, LBL_RIGHT_POS)].attrs.text.text;
-            })
-            .map(function(input) {
-                return input.attributes.signal;
-            })
-            .value();
-            broadcastBus(gate, busIn);
-        } else if (gate instanceof joint.shapes.logic.Register) {
-            // broadcast
-            broadcastBus(gate, gate.operation.apply(gate));
-        }
 
 
-        // For other combinational-logic gates like and, or, xor, etc.
-        else {
-            gate.onSignal(signal, function() {
-                // get an array of signals on all input ports
-                var inputs = _.chain(rgraph.getConnectedLinks(gate, { inbound: true }))
-                    .sortBy(function(wire) { 
-                        return wire.get('target').port;     // sort all inputs based on labels (in1, in2, ...)
-                    })
-                    .groupBy(function(wire) {
-                        return wire.get('target').port;
-                    })
-                    .map(function(wires) {
-                        return Math.max.apply(this, _.invoke(wires, 'get', 'signal')) > 0;
-                    })
-                    .value();
-                // calculate the output signal
-                // console.log(inputs);
-                var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
-                
-                broadcastSignal(gate, output);
-            });
-        }
-   }
-});
-
-
-
-// Labeling links
-function labelLink(link) {
-    var source = link.getSourceElement();
-    var target = link.getTargetElement();
-    
-    // Special gates with multi-value inputs/outputs on same port
-    if (target !== null && target.attributes.type === JOINER && hasNoLabel(link, LBL_RIGHT_POS)) {
-        setLabel(link, rgraph.getConnectedLinks(target, { inbound: true }).length - 1, nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
-    } else if (source !== null && source.attributes.type === SPLITTER && hasNoLabel(link, LBL_LEFT_POS)) {
-        setLabel(link, rgraph.getConnectedLinks(source, { outbound: true }).length - 1, nextLabelIndex(link, LBL_RIGHT_POS), LBL_LEFT_POS);
-    } else if (source !== null && hasMultiOutputValuesSamePort(source) && hasNoLabel(link, LBL_LEFT_POS)) {
-        // get currently used labels
-        var usedLabels = _.map(rgraph.getConnectedLinks(source, { outbound: true }), function(link){
-            if (link.attributes.labels === undefined) return undefined;
-            return link.attributes.labels[nextLabelIndex(link, LBL_LEFT_POS)].attrs.text.text;
-        });
-        // find first unused label
-        var unusedLabels = _.difference(source.outputsList.apply(source), usedLabels);
-        if (unusedLabels !== undefined && unusedLabels.length > 0) {
-            setLabel(link, unusedLabels[0], nextLabelIndex(link, LBL_LEFT_POS), LBL_LEFT_POS);
-        } else if (unusedLabels.length == 0) {
-            // Remove immediately if reached maximum number of outputs
-            link.remove();
-        }
-    } else if (target !== null && target.attributes.type === SMC && hasNoLabel(link, LBL_RIGHT_POS)) {
-        setLabel(link, 'inst_in', nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
-    } 
-
-    // Other general boxes (each port is a single bus/wire)
-    else if (target !== null && window.views[target.attributes.type].prototype.portList !== undefined && hasNoLabel(link, LBL_RIGHT_POS)) {
-        setLabel(link, window.views[target.attributes.type].prototype.portList[link.attributes.target.port].label, nextLabelIndex(link, LBL_RIGHT_POS), LBL_RIGHT_POS);
-    } else if (source !== null && window.views[source.attributes.type].prototype.portList !== undefined && hasNoLabel(link, LBL_LEFT_POS)) {
-        setLabel(link, window.views[source.attributes.type].prototype.portList[link.attributes.source.port].label, nextLabelIndex(link, LBL_LEFT_POS), LBL_LEFT_POS);
-    }
-}
 
 
 
@@ -485,6 +477,21 @@ rgraph.on('remove', function(cell) {
 
 
 
+//////////////////////// BUTTONS CLICK EVENT HANDLING //////////////////////
+// Zoom in 
+$('#zoomInBtn').click(function() {
+    scale.x = scale.x * scale.rate;
+    scale.y = scale.y * scale.rate;
+    rpaper.scale(scale.x, scale.y);
+});
+
+// Zoom out
+$('#zoomOutBtn').click(function() {
+    scale.x = scale.x / scale.rate;
+    scale.y = scale.y / scale.rate;
+    rpaper.scale(scale.x, scale.y);
+});
+
 $("#simBtn").click(function() {
 
     simulateOn = true;
@@ -512,7 +519,7 @@ $("#resetBtn").click(function() {
 });
 
 $("#stepForward").click(function() {
-    incrDff(rgraph);
+    incrTimeStep(rgraph);
     $("#currTimeStep").html(timeStep);
     current = initializeSignal();
 });
